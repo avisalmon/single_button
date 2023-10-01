@@ -16,7 +16,7 @@ display = ssd1306.SSD1306_I2C(128, 64, i2c)  # display object
 # We are using 2 color screen. 0 is black. 1 is white
 # clear the screen:
 display.fill(0)
-display.line(10, 10, 50, 50, 1)
+display.line(30, 10, 50, 50, 1)
 display.show()
 
 # our screen:
