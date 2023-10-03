@@ -15,9 +15,9 @@ To get it up and running you need to:
 8. In Thonny: 
 	- Tools > Mnage Plug-ins > make sure esptools is installed. 
 	- Tools > Options > Interperter > choose MicroPython(ESP32)
-		> Choose the correct Port
-		> goto install or update MicroPython
-		> Choose the right Port
-		> Chose or find the .bin file FW to upload in this repository root. 
-		> install. Sometimes you will need to press the boot button on the ESP32 while installing. This is the button right to the USB connector
+	- > Choose the correct Port
+	- > goto install or update MicroPython
+	- > Choose the right Port
+	- > Chose or find the .bin file FW to upload in this repository root. 
+	- > install. Sometimes you will need to press the boot button on the ESP32 while installing. This is the button right to the USB connector
 9. In Thonny open the cloned directory. See the examples.  
