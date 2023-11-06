@@ -56,7 +56,7 @@ def draw_clock_num(display, x, y, radius, number):
 def draw_mahog(display, hour, min, sec, x, y, radius):
     draw_circle(display, x, y, 4, steps=20)
     
-    hour_angle_radian = (90 - (hour*30 + min*0.1) * pi / 180)
+    hour_angle_radian = ((90 - (hour*30 + min*0.1)) * pi / 180)
     hour_point_x = int(x + (radius - 15)*cos(hour_angle_radian))
     hour_point_y = int(y - (radius - 15)*sin(hour_angle_radian))
     display.line(x, y, hour_point_x, hour_point_y, 1)
