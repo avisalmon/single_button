@@ -7,6 +7,9 @@
 # Lesson 1: Basic drawing on screen, Lines
 # ****************************************
 
+
+# Hi Guys ******************
+
 from machine import Pin, I2C
 import ssd1306
 

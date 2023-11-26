@@ -1,0 +1,9 @@
+Read image:
+python .\esptool\esptool.py --port COM4 --baud 921600 read_flash 0x00000 0x40000 firmware_dump.bin
+
+full image with files:
+python .\esptool\esptool.py --port COM4 --baud 921600 read_flash 0 0x400000 full_flash_dump.bin
+
+upload image:
+python .\esptool\esptool.py --port COM4 --baud 921600 write_flash 0 micro_python_starter.bin
+
