@@ -5,18 +5,18 @@ import time
 import urandom
 
 # Initialize I2C for OLED
-i2c = machine.I2C(scl=machine.Pin(26), sda=machine.Pin(27))
+i2c = machine.I2C(scl=machine.Pin(22), sda=machine.Pin(21))
 oled = ssd1306.SSD1306_I2C(128, 64, i2c)
 
 from time import sleep_ms
-buzzer_pin = Pin(13, Pin.OUT)
+buzzer_pin = Pin(23, Pin.OUT)
 buzzer_pwm = PWM(buzzer_pin)
 
 # Initialize buttons and buzzer
-buttons = [machine.Pin(i, machine.Pin.IN, machine.Pin.PULL_UP) for i in [14,32,33,25]]
+buttons = [machine.Pin(i, machine.Pin.IN, machine.Pin.PULL_UP) for i in [4,2]]
 print(buttons)
 
-SOUND = [440, 1200, 1500, 2000]
+SOUND = [440, 1200]
 
 # Function to play sound
 def play_sound(button_index):
@@ -37,7 +37,7 @@ def read_button():
     # wait for key:
     while in_read == -1:
         sleep_ms(100)
-        vals = [buttons[n].value() for n in range(4)]
+        vals = [buttons[n].value() for n in range(2)]
         #print(vals)
         if 0 in vals:
             print(1)
@@ -49,7 +49,7 @@ def read_button():
     buzzer_pwm.freq(SOUND[in_read])
     buzzer_pwm.duty(512)
     while in_read != -1:
-        vals = [buttons[n].value() for n in range(4)]
+        vals = [buttons[n].value() for n in range(2)]
         if 0 not in vals:
             in_read = -1
             buzzer_pwm.duty(0)
@@ -58,7 +58,7 @@ def read_button():
 
 # Main game logic
 def play_simon_game():
-    for n in range(4):
+    for n in range(2):
         play_sound(n)
         
  
@@ -67,7 +67,7 @@ def play_simon_game():
     sequence = []
     game_on = True
     while game_on:
-        sequence.append(urandom.randint(0, 3))
+        sequence.append(urandom.randint(0, 1))
         print(sequence)
         for index in sequence:
             play_sound(index)
@@ -88,9 +88,5 @@ def play_simon_game():
     
 
 # Run the game
-while True:
-    play_simon_game()
-    time.sleep(2)
-    game_on = True
-
+play_simon_game()
 
