@@ -4,7 +4,7 @@
 # By: Avi Salmon
 # All instructions on github/avisalmon/TBD
 #
-# Lesson 1: Basic drawing on screen, Moving the lines
+# Lesson 2: Basic drawing on screen, Moving the lines
 # ****************************************
 
 from machine import Pin, I2C
@@ -21,20 +21,18 @@ y = 0
 x_speed = 1
 y_speed = 1
 
-t1 = 0
-
 while True:
+    # prepare the screen
     display.fill(0)
     display.line(x, y, 63, 63, 1)
-    #t_prep = ticks_ms() - t1
-    #ts = ticks_ms()
+
+    # Send the buffer to the screen
     display.show()
-    #t_show = ticks_ms() - ts
-    #t1 = ticks_ms()
+
+    # manipulate the game
     x += x_speed
     if x > 127 or x < 0:
         x_speed *= -1
-    #print(f'prep: {t_prep}ms ; show: {t_show}ms')
         
 
 # our screen:
@@ -45,7 +43,8 @@ while True:
 
 #Now you:
 # 1. Make it faster
-# 2. Make the other end of the line move as well
+# 2. Flip the direction. The top side is still and the bottom is moving. 
 # 3. Do something creative with the line. 
+
 
 

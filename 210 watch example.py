@@ -21,8 +21,8 @@ import utime
 try:
     from keys import SSID, PASSWORD
 except:
-    SSID = ''
-    PASSWORD = ''
+    SSID = '****'
+    PASSWORD = '****'
     
 print(PASSWORD, SSID)
 

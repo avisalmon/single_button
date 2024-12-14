@@ -4,7 +4,7 @@
 # By: Avi Salmon
 # All instructions on github/avisalmon/TBD
 #
-# Lesson 1: Pong 4: Snake + IRQ
+# Snake + IRQ
 # ****************************************
 
 from machine import Pin, I2C, PWM, Timer

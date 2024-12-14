@@ -2,13 +2,15 @@
 #
 # Learning Micro Python and programming with ESP32
 # By: Avi Salmon
-# All instructions on github/avisalmon/TBD
+# All instructions on https://github.com/avisalmon/single_button
 #
 # Lesson 1: Basic drawing on screen, Lines
+#
+# Make sure to download to the device all files in directory "Upload_this_to_device"
 # ****************************************
 
 
-# Hi Guys ******************
+# Setting imports, and display
 
 from machine import Pin, I2C
 import ssd1306
@@ -27,16 +29,9 @@ display.show()
 #
 # 0,63			127,63
 
-display.line(0, 0, 127, 0, 1)
-display.line(127, 0, 127, 63, 1)
-display.line(127, 63, 0, 63, 1)
-display.line(0, 63, 0, 0, 1)
-
-display.show()
-
-
 
 #Now you:
-# 1. Draw your name Third letter.
-# 2. Not a must: Draw squares on all the screen like a squared paper.
+# 1. Draw a big X on the screen
+# 2. Draw your name Third letter.
+ 
 

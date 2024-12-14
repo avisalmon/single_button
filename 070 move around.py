@@ -2,9 +2,9 @@
 #
 # Learning Micro Python and programming with ESP32
 # By: Avi Salmon
-# All instructions on github/avisalmon/TBD
+# All instructions on https://github.com/avisalmon/single_button
 #
-# Lesson 1: single Player move
+# Lesson 7: single Player move
 # ****************************************
 
 from machine import Pin, I2C

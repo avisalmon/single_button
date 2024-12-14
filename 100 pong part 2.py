@@ -2,9 +2,9 @@
 #
 # Learning Micro Python and programming with ESP32
 # By: Avi Salmon
-# All instructions on github/avisalmon/TBD
+# All instructions on https://github.com/avisalmon/single_button
 #
-# Lesson 1: Pong 2: the ball
+# Lesson Pong 2: the ball
 # ****************************************
 
 from machine import Pin, I2C

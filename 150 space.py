@@ -2,7 +2,7 @@
 #
 # Learning Micro Python and programming with ESP32
 # By: Avi Salmon
-# All instructions on github/avisalmon/TBD
+# All instructions on https://github.com/avisalmon/single_button
 #
 # Game Demo - Space invadors. 
 # ****************************************

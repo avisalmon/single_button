@@ -4,7 +4,7 @@
 # By: Avi Salmon
 # All instructions on github/avisalmon/TBD
 #
-# Lesson 1: Text
+# Lesson 4: Text
 # ****************************************
 
 # Make sure to upload all files in the directory Upload_these_to_device to the dvice.
