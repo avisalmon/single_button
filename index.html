@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>תכנות אמיתי עם ESP32 | תכנית לאימוץ</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0f1117;
+      --bg-soft: #151a25;
+      --bg-panel: #1a2130;
+      --line: #2a3446;
+      --text: #eef2f7;
+      --muted: #aeb8c8;
+      --quiet: #7f8ba0;
+      --accent: #4cc9f0;
+      --accent-strong: #72efdd;
+      --warm: #ffd166;
+      --good: #7bd88f;
+    }
+
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      direction: rtl;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page-shell {
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, rgba(76, 201, 240, 0.08), transparent 380px),
+        var(--bg);
+    }
+
+    .hero {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 54px 24px 56px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+      gap: 40px;
+      align-items: center;
+    }
+
+    .hero-image-wrap {
+      max-width: 360px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #0a0d13;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+    }
+
+    .hero-image {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .hero-content {
+      min-width: 0;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(76, 201, 240, 0.32);
+      background: rgba(76, 201, 240, 0.09);
+      color: var(--accent);
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      max-width: 880px;
+      font-size: clamp(2.25rem, 5vw, 4.6rem);
+      line-height: 1.13;
+      font-weight: 850;
+      letter-spacing: 0;
+      margin-bottom: 24px;
+    }
+
+    .hero-lead {
+      max-width: 780px;
+      color: var(--muted);
+      font-size: clamp(1.08rem, 2vw, 1.32rem);
+      margin-bottom: 34px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 42px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      border-radius: 8px;
+      padding: 12px 22px;
+      font-weight: 800;
+      text-decoration: none;
+      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .button.primary {
+      background: var(--accent);
+      color: #071017;
+      border: 1px solid var(--accent);
+    }
+
+    .button.secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+    }
+
+    .button.secondary:hover {
+      border-color: var(--accent);
+      background: rgba(76, 201, 240, 0.08);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(150px, 1fr));
+      gap: 14px;
+      grid-column: 1 / -1;
+    }
+
+    .summary-item {
+      border: 1px solid var(--line);
+      background: rgba(26, 33, 48, 0.82);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .summary-number {
+      color: var(--accent-strong);
+      display: block;
+      font-size: 1.85rem;
+      font-weight: 850;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .summary-label {
+      color: var(--muted);
+      font-size: 0.93rem;
+    }
+
+    main {
+      overflow: hidden;
+    }
+
+    section {
+      border-top: 1px solid var(--line);
+    }
+
+    .section-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 68px 24px;
+    }
+
+    .section-kicker {
+      color: var(--accent);
+      font-size: 0.86rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      max-width: 780px;
+      font-size: clamp(1.7rem, 3vw, 2.55rem);
+      line-height: 1.22;
+      font-weight: 850;
+      margin-bottom: 16px;
+    }
+
+    .section-text {
+      max-width: 780px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      margin-bottom: 34px;
+    }
+
+    .two-column {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      background: var(--bg-panel);
+      border-radius: 8px;
+      padding: 26px;
+    }
+
+    .panel h3 {
+      font-size: 1.18rem;
+      line-height: 1.35;
+      margin-bottom: 10px;
+    }
+
+    .panel p,
+    .panel li {
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    .panel strong {
+      color: var(--text);
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .feature {
+      border: 1px solid var(--line);
+      background: var(--bg-soft);
+      border-radius: 8px;
+      padding: 24px;
+    }
+
+    .feature-mark {
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      margin-bottom: 14px;
+      background: rgba(76, 201, 240, 0.12);
+      color: var(--accent-strong);
+      font-weight: 900;
+    }
+
+    .feature h3 {
+      font-size: 1.08rem;
+      margin-bottom: 8px;
+    }
+
+    .feature p {
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    .arc {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      counter-reset: arc;
+    }
+
+    .arc-step {
+      position: relative;
+      border: 1px solid var(--line);
+      background: var(--bg-soft);
+      border-radius: 8px;
+      padding: 24px 22px;
+      min-height: 220px;
+    }
+
+    .arc-step::before {
+      counter-increment: arc;
+      content: counter(arc, decimal-leading-zero);
+      display: inline-block;
+      color: var(--warm);
+      font-weight: 900;
+      margin-bottom: 18px;
+      font-size: 0.92rem;
+    }
+
+    .arc-step h3 {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+    }
+
+    .arc-step p {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .check-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      list-style: none;
+    }
+
+    .check-list li {
+      border: 1px solid var(--line);
+      background: rgba(21, 26, 37, 0.88);
+      border-radius: 8px;
+      padding: 16px 18px;
+      color: var(--muted);
+    }
+
+    .check-list li::before {
+      content: "✓";
+      color: var(--good);
+      font-weight: 900;
+      margin-left: 10px;
+    }
+
+    .lessons-list {
+      display: grid;
+      gap: 14px;
+      counter-reset: lesson;
+    }
+
+    .lesson-row {
+      counter-increment: lesson;
+      display: grid;
+      grid-template-columns: 54px minmax(0, 1fr) minmax(180px, 240px);
+      gap: 18px;
+      align-items: start;
+      border: 1px solid var(--line);
+      background: var(--bg-soft);
+      border-radius: 8px;
+      padding: 18px;
+    }
+
+    .lesson-row::before {
+      content: counter(lesson, decimal-leading-zero);
+      width: 42px;
+      height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: rgba(255, 209, 102, 0.12);
+      color: var(--warm);
+      font-weight: 900;
+      font-size: 0.92rem;
+    }
+
+    .lesson-main h3 {
+      font-size: 1.08rem;
+      margin-bottom: 6px;
+    }
+
+    .lesson-main p {
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    .lesson-code {
+      color: var(--accent-strong);
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      direction: ltr;
+      text-align: left;
+      overflow-wrap: anywhere;
+    }
+
+    .source-panel {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: center;
+      border: 1px solid rgba(76, 201, 240, 0.28);
+      background: rgba(76, 201, 240, 0.07);
+      border-radius: 8px;
+      padding: 22px 24px;
+      margin-bottom: 24px;
+    }
+
+    .source-panel h3 {
+      font-size: 1.12rem;
+      margin-bottom: 6px;
+    }
+
+    .source-panel p {
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    .adoption-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .metric-row {
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .metric-row p {
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+    }
+
+    .cta {
+      border-top: 1px solid var(--line);
+      background: #10151f;
+    }
+
+    .cta .section-inner {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 28px;
+      align-items: center;
+      padding-top: 54px;
+      padding-bottom: 54px;
+    }
+
+    .cta p {
+      color: var(--muted);
+      max-width: 720px;
+    }
+
+    .cta .hero-actions {
+      margin-bottom: 0;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      background: #0a0d13;
+      color: var(--quiet);
+      padding: 28px 24px;
+      text-align: center;
+      font-size: 0.92rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    @media (max-width: 900px) {
+      .summary-grid,
+      .hero,
+      .feature-grid,
+      .arc,
+      .adoption-grid,
+      .check-list,
+      .two-column,
+      .source-panel,
+      .cta .section-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-image-wrap {
+        max-width: 520px;
+        margin: 0 auto;
+      }
+
+      .arc-step {
+        min-height: auto;
+      }
+
+      .lesson-row {
+        grid-template-columns: 48px minmax(0, 1fr);
+      }
+
+      .lesson-code {
+        grid-column: 2;
+      }
+
+      .source-panel .button {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .hero {
+        padding-top: 32px;
+      }
+
+      .hero-actions,
+      .button {
+        width: 100%;
+      }
+
+      .section-inner {
+        padding-top: 52px;
+        padding-bottom: 52px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <div class="hero-content">
+        <div class="eyebrow">תכנית לימודים לאימוץ בבתי ספר ובמרכזי מצוינות</div>
+        <h1>תכנות שמרגישים בידיים, לא רק רואים על המסך.</h1>
+        <p class="hero-lead">
+          תכנית לימוד מעשית שמכניסה תלמידים לעולם התכנות דרך MicroPython, לוח ESP32, מסך קטן וכפתור אחד. מהרגע הראשון הקוד מפעיל חומרה אמיתית, ובהדרגה הוא הופך למשחקים, ממשקים ויישומי IoT שאפשר להציג, להסביר ולשפר. בסוף התכנית התלמידים לומדים כיצד AI יכול לעזור בכתיבת תוכניות, אבל רק אחרי שהם למדו לעשות זאת בעצמם. זה דגש מרכזי בעידן הנוכחי: קודם להבין, לבנות ולתקן לבד, ורק אחר כך לתת לבינה מלאכותית לעבוד איתנו.
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="https://github.com/avisalmon/single_button" target="_blank" rel="noopener">לצפייה בקוד ובחומרי המקור</a>
+          <a class="button secondary" href="#adoption">מה נדרש כדי לאמץ</a>
+        </div>
+      </div>
+      <div class="hero-image-wrap">
+        <img class="hero-image" src="docs/Picture1.png" alt="ערכת ESP32 ללימוד תכנות עם מסך וכפתור" />
+      </div>
+      <div class="summary-grid" aria-label="תקציר התכנית">
+        <div class="summary-item">
+          <span class="summary-number">19</span>
+          <span class="summary-label">דוגמאות קוד מדורגות במאגר</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-number">0</span>
+          <span class="summary-label">ידע קודם נדרש מהתלמידים</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-number">4</span>
+          <span class="summary-label">רכיבי בסיס בערכת הלימוד</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-number">1</span>
+          <span class="summary-label">שפה מרכזית, Python בעולם האמיתי</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section id="vision">
+        <div class="section-inner two-column">
+          <div>
+            <div class="section-kicker">הרעיון</div>
+            <h2>להפוך תכנות מחומר מופשט לחוויה שאפשר לבדוק מיד.</h2>
+            <p class="section-text">
+              רוב התלמידים פוגשים תכנות דרך חלון במחשב. כאן הם כותבים שורה, מעלים אותה ללוח, ורואים פעולה פיזית: קו זז, כפתור משנה מצב, צליל נשמע, משחק מגיב. הפידבק המיידי מחזק התמדה, סקרנות וביטחון עצמי.
+            </p>
+          </div>
+          <div class="panel">
+            <h3>למה זה מתאים למקבלי החלטות</h3>
+            <p>
+              התכנית פשוטה להפעלה, מבוססת ציוד זול וזמין, נשענת על קוד פתוח, ומייצרת תוצרים מוחשיים שניתן להציג להורים, הנהלה וקהילה. היא מחברת בין יסודות מדעי המחשב לבין חומרה, משחקים, אינטרנט וחשיבה יצירתית.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="value">
+        <div class="section-inner">
+          <div class="section-kicker">למה לאמץ</div>
+          <h2>תכנית קטנה להפעלה, גדולה בהשפעה.</h2>
+          <p class="section-text">
+            הערכה בנויה סביב אילוץ מכוון: מסך קטן וכפתור אחד. האילוץ מפשט את ההתחלה, אך מספיק עשיר כדי ללמד תכנון, לוגיקה, ממשק משתמש, משחקיות, תקשורת וריצה על חומרה.
+          </p>
+          <div class="feature-grid">
+            <div class="feature">
+              <div class="feature-mark">1</div>
+              <h3>כניסה נגישה לעולם הקוד</h3>
+              <p>אין צורך ברקע קודם. מתחילים מציור קו ומתקדמים בקצב טבעי למשתנים, תנאים, לולאות, פונקציות ומחלקות.</p>
+            </div>
+            <div class="feature">
+              <div class="feature-mark">2</div>
+              <h3>תוצרים שמחזיקים עניין</h3>
+              <p>התלמידים בונים משחקים וכלים קטנים במקום לפתור רק תרגילים. כל שלב מוסיף יכולת שאפשר לראות ולהדגים.</p>
+            </div>
+            <div class="feature">
+              <div class="feature-mark">3</div>
+              <h3>חיבור לעולם טכנולוגי אמיתי</h3>
+              <p>MicroPython, GPIO, מסכים, צלילים, WiFi, API ונתונים מהאינטרנט. אלו מושגים מעשיים שנמצאים גם מחוץ לכיתה.</p>
+            </div>
+            <div class="feature">
+              <div class="feature-mark">4</div>
+              <h3>עלות ותפעול בשליטה</h3>
+              <p>הציוד מינימלי, ניתן לשימוש חוזר, והקוד פתוח. אפשר להתחיל בקבוצה קטנה ולהתרחב לאחר פיילוט.</p>
+            </div>
+            <div class="feature">
+              <div class="feature-mark">5</div>
+              <h3>מפתח חשיבה הנדסית</h3>
+              <p>התלמידים לומדים לפרק בעיה, לבדוק השערות, לתקן שגיאות, ולשפר מוצר קטן עד שהוא עובד.</p>
+            </div>
+            <div class="feature">
+              <div class="feature-mark">6</div>
+              <h3>מתאים להמשך למידה</h3>
+              <p>אותם עקרונות מובילים בהמשך לרובוטיקה, IoT, פיתוח משחקים, בינה מלאכותית ופרויקטי גמר.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="arc">
+        <div class="section-inner">
+          <div class="section-kicker">מהלך הלמידה</div>
+          <h2>מסלול מדורג, ברור וקל להסבר.</h2>
+          <p class="section-text">
+            פרטי השיעורים יופיעו במסמך נפרד. ברמת האימוץ, חשוב להבין את הקשת הפדגוגית: מעבר הדרגתי מקוד בסיסי לתוצר עצמאי, בלי לדלג על יסודות.
+          </p>
+          <div class="arc">
+            <div class="arc-step">
+              <h3>התחלה חזותית</h3>
+              <p>ציור קווים, צורות וטקסט על מסך OLED. התלמידים מבינים קואורדינטות, פיקסלים והקשר הישיר בין קוד לתוצאה.</p>
+            </div>
+            <div class="arc-step">
+              <h3>קלט ואינטראקציה</h3>
+              <p>קריאת כפתור, תנאים, שינוי מצב ותגובה לפעולה של המשתמש. כאן התכנית הופכת מתצוגה למערכת אינטראקטיבית.</p>
+            </div>
+            <div class="arc-step">
+              <h3>משחקים ולוגיקה</h3>
+              <p>תנועה, התנגשויות, ניקוד, צלילים, מחלקות וניהול כמה אובייקטים על מסך קטן. הלמידה נשארת מוחשית ומאתגרת.</p>
+            </div>
+            <div class="arc-step">
+              <h3>חיבור לעולם</h3>
+              <p>WiFi, קריאת נתונים מהרשת, זמן אמת ופרויקטים פתוחים. בסוף התלמידים יכולים להציע רעיון ולהפוך אותו למשהו עובד.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="outcomes">
+        <div class="section-inner">
+          <div class="section-kicker">תוצאות צפויות</div>
+          <h2>בסוף התכנית התלמידים לא רק נחשפו לתכנות. הם בנו משהו.</h2>
+          <p class="section-text">
+            התוצרים אינם קישוט. הם הדרך להראות הבנה: תלמיד שמסביר למה הכדור קופץ, איך הכפתור משנה כיוון, או למה הקוד נתקע בלולאה, כבר חושב כמו מפתח בתחילת הדרך.
+          </p>
+          <ul class="check-list">
+            <li>כתיבת קוד Python בסיסי ומובן</li>
+            <li>עבודה עם לולאות, תנאים, משתנים ופונקציות</li>
+            <li>שליטה בקלט פיזי דרך GPIO</li>
+            <li>ציור ממשק פשוט על מסך קטן</li>
+            <li>בניית לוגיקת משחק מלאה</li>
+            <li>היכרות ראשונה עם מחלקות ואובייקטים</li>
+            <li>שימוש ב-WiFi ובנתונים מהאינטרנט</li>
+            <li>איתור תקלות ושיפור קוד קיים</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="adoption">
+        <div class="section-inner">
+          <div class="section-kicker">אימוץ והפעלה</div>
+          <h2>אפשר להתחיל כפיילוט קצר ולהרחיב לפי הצלחה.</h2>
+          <p class="section-text">
+            התכנית נועדה להיות פרקטית למוסד: מעט ציוד, התקנה פשוטה, מאגר קוד פתוח, ואפשרות להריץ קבוצה ראשונה לפני החלטה על פריסה רחבה.
+          </p>
+          <p class="section-text">
+            כמות השיעורים גדולה ממה שתלמיד ממוצע יכול להכיל במסגרת אחת, בכוונה. כך ניתן לבחור מסלול לפי גיל, זמן ורמת קבוצה, ולתת לתלמידים מצטיינים מספיק חומר להעמקה ולהתקדמות עצמאית. התכנים יהיו נגישים באתר זה גם ללמידה עצמית.
+          </p>
+          <div class="adoption-grid">
+            <div class="panel">
+              <h3>מה צריך כדי להתחיל</h3>
+              <div class="metric-row">
+                <p><strong>מחשבים עם Windows 10 ומעלה:</strong> סביבת הפיתוח Thonny משמשת לכתיבה ולהעלאה של הקוד.</p>
+                <p><strong>ערכת ESP32 לכל תלמיד או זוג:</strong> לוח ESP32, מסך OLED, כפתור ובאזר.</p>
+                <p><strong>מדריך עם אוריינטציה טכנולוגית:</strong> אין צורך במעבדת רובוטיקה מלאה כדי להתחיל.</p>
+              </div>
+            </div>
+            <div class="panel">
+              <h3>איך למדוד הצלחה</h3>
+              <div class="metric-row">
+                <p><strong>תוצר עובד:</strong> כל תלמיד מציג קוד שרץ על הערכה ולא רק קובץ במחשב.</p>
+                <p><strong>הסבר בעל פה:</strong> התלמיד יודע להסביר מה הקוד עושה ואיפה מתקנים תקלה.</p>
+                <p><strong>הרחבה אישית:</strong> בסיום, התלמיד מוסיף שינוי משלו למשחק או לכלי שבנה.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="fit">
+        <div class="section-inner two-column">
+          <div>
+            <div class="section-kicker">התאמה אסטרטגית</div>
+            <h2>תכנית שמשרתת גם למידה, גם חדשנות וגם נראות ציבורית.</h2>
+            <p class="section-text">
+              עבור מקבלי החלטות, הערך אינו רק בעוד קורס תכנות. הערך הוא בתכנית שמייצרת חוויית STEM מוחשית, מחברת תלמידים לטכנולוגיה עדכנית, ומאפשרת להציג התקדמות ברורה לקהילה ולשותפים.
+            </p>
+          </div>
+          <div class="panel">
+            <h3>המסר המרכזי</h3>
+            <p>
+              התכנית הופכת את התלמידים מצרכני מסכים ליוצרי מערכות קטנות. הם לא רק משחקים במשחק. הם מבינים איך משחק עובד, בונים אותו, מתקנים אותו, ואז משנים אותו בעצמם.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="lessons">
+        <div class="section-inner">
+          <div class="section-kicker">רשימת שיעורים ותוכן</div>
+          <h2>מה לומדים בפועל, מהקוד הראשון ועד פרויקטים שלמים.</h2>
+          <p class="section-text">
+            זהו פירוט תמציתי של קבצי הלימוד הקיימים במאגר. הוא נותן למקבלי החלטות תמונה ברורה של רצף הלמידה, בלי להיכנס עדיין למערכי שיעור מלאים.
+          </p>
+          <div class="source-panel">
+            <div>
+              <h3>מקור לימוד נוסף בווידאו</h3>
+              <p>למי שרוצה ללמוד גם מההסברים המצולמים, קיימת רשימת YouTube מלאה שמלווה את הקורס ואת הדוגמאות.</p>
+            </div>
+            <a class="button secondary" href="https://youtube.com/playlist?list=PL0zMMCdiaE56wAuAqmGXPQlCa_2BCWRi6" target="_blank" rel="noopener">פתיחת רשימת YouTube</a>
+          </div>
+          <div class="lessons-list">
+            <div class="lesson-row">
+              <div class="lesson-main">
+                <h3>ציור קו ראשון על המסך</h3>
+                <p>היכרות עם הלוח, I2C, מסך OLED, מערכת קואורדינטות, ניקוי מסך והצגת פלט ראשון.</p>
+              </div>
+              <div class="lesson-code">010 lines.py</div>
+            </div>
+            <div class="lesson-row">
+              <div class="lesson-main">
+                <h3>קו בתנועה</h3>
+                <p>משתנים, לולאה רציפה, מהירות, שינוי כיוון וקפיצה מגבולות המסך.</p>
+              </div>
+              <div class="lesson-code">020 move the line.py</div>
+            </div>
+            <div class="lesson-row">
+              <div class="lesson-main">
+                <h3>צורות וכלי ציור</h3>
+                <p>פיקסלים, קווים אופקיים ואנכיים, מלבנים, מילוי אזורים והבנה שהמסך בנוי מנקודות.</p>
+              </div>
+              <div class="lesson-code">030 more than lines.py</div>
+            </div>
+            <div class="lesson-row">
+              <div class="lesson-main">
+                <h3>טקסט וגופנים</h3>
+                <p>כתיבת טקסט על המסך, מיקום, גדלים שונים, שימוש בספריית גופן ובניית ממשק בסיסי.</p>
+              </div>
+              <div class="lesson-code">040 text.py</div>
+            </div>
+            <div class="lesson-row">
+              <div class="lesson-main">
+                <h3>קריאת כפתור פיזי</h3>
+                <p>GPIO, כניסת Pull Up, תנאים, תגובה ללחיצה והמעבר הראשון מתצוגה למערכת אינטראקטיבית.</p>
+              </div>
+              <div class="lesson-code">050 read button.py</div>
+            </div>
+            <div class="lesson-row">
+              <div class="lesson-main">
+                <h3>ספרייטים וציור יעיל</h3>
+                <p>FrameBuffer, העתקת ציור למסך, שקיפות, והכנה לעבודה עם דמויות במשחקים.</p>
+              </div>
+              <div class="lesson-code">060 blit.py</div>
+            </div>
+            <div class="lesson-row">
+              <div class="lesson-main">
+                <h3>דמות שזזה על המסך</h3>
+                <p>מיקום, מהירות, גבולות, מחיקת מסך וציור מחדש. תבנית בסיסית לכל משחק.</p>
+              </div>
+              <div class="lesson-code">070 move around.py</div>
+            </div>
+            <div class="lesson-row">
+              <div class="lesson-main">
+                <h3>כמה דמויות ומחלקות</h3>
+                <p>מחלקות, אובייקטים, רשימות ולולאות. אותה תבנית מייצרת כמה שחקנים עצמאיים.</p>
+              </div>
+              <div class="lesson-code">080 few players.py</div>
+            </div>
+            <div class="lesson-row">
+              <div class="lesson-main">
+                <h3>פונג, שליטה במחבט</h3>
+                <p>תנועה לפי כפתור, החלפת כיוון, שמירת מצב לחיצה ובניית שליטה טבעית מממשק פשוט.</p>
+              </div>
+              <div class="lesson-code">090 pong part 1.py</div>
+            </div>
+            <div class="lesson-row">
+              <div class="lesson-main">
+                <h3>פונג, כדור ומשחק על מסך אחד</h3>
+                <p>שילוב מחבט וכדור, תנועה עצמאית של אובייקטים, גבולות וקצב משחק.</p>
+              </div>
+              <div class="lesson-code">100 pong part 2.py</div>
+            </div>
+            <div class="lesson-row">
+              <div class="lesson-main">
+                <h3>פונג, זיהוי התנגשות</h3>
+                <p>פונקציית collision, בדיקת חפיפה בין מלבנים, החזרת כדור והפיכת הדוגמה למשחק עובד.</p>
+              </div>
+              <div class="lesson-code">110 pong part 3 colision.py</div>
+            </div>
+            <div class="lesson-row">
+              <div class="lesson-main">
+                <h3>חיבור WiFi ונתוני רשת</h3>
+                <p>חיבור לאינטרנט, קריאת API, JSON, הצגת מזג אוויר חי והיכרות ראשונה עם IoT.</p>
+              </div>
+              <div class="lesson-code">120 pong part 4 beep.py</div>
+            </div>
+            <div class="lesson-row">
+              <div class="lesson-main">
+                <h3>משחק נחש</h3>
+                <p>משחק מלא עם רשימות, אקראיות, תזמון, צמיחה, ניקוד, קלט מקביל וצלילים.</p>
+              </div>
+              <div class="lesson-code">130 smake.py</div>
+            </div>
+            <div class="lesson-row">
+              <div class="lesson-main">
+                <h3>סיימון, זיכרון וקלט מדויק</h3>
+                <p>רצפים אקראיים, אימות תשובת משתמש, שני כפתורים, צלילים ומשוב הצלחה או כישלון.</p>
+              </div>
+              <div class="lesson-code">140 simon.py</div>
+            </div>
+            <div class="lesson-row">
+              <div class="lesson-main">
+                <h3>Space Invaders בסיסי</h3>
+                <p>שחקן, אויבים, ירי, פגיעות, הסרת אובייקטים, רמת קושי עולה וניהול משחק מלא.</p>
+              </div>
+              <div class="lesson-code">150 space.py</div>
+            </div>
+            <div class="lesson-row">
+              <div class="lesson-main">
+                <h3>Space Invaders עם אנימציה</h3>
+                <p>ספרייטים מונפשים, טעינת נכסי גרפיקה, ירושה, הפרדה בין קצב משחק לקצב אנימציה.</p>
+              </div>
+              <div class="lesson-code">170 space animated.py</div>
+            </div>
+            <div class="lesson-row">
+              <div class="lesson-main">
+                <h3>שעון מחובר לאינטרנט</h3>
+                <p>NTP, זמן אמת, חיבור WiFi, חישוב זוויות, טריגונומטריה בסיסית וציור שעון אנלוגי.</p>
+              </div>
+              <div class="lesson-code">210 watch example.py</div>
+            </div>
+            <div class="lesson-row">
+              <div class="lesson-main">
+                <h3>זרוע רובוטית</h3>
+                <p>מעבר ממשחקים למערכת מכנית, תנועה של רכיב חיצוני והבנה שקוד יכול להזיז חומרה בעולם.</p>
+              </div>
+              <div class="lesson-code">220 robot arm.py</div>
+            </div>
+            <div class="lesson-row">
+              <div class="lesson-main">
+                <h3>שליטה בזרוע רובוטית</h3>
+                <p>שילוב קלט ושליטה בתנועה, בניית ממשק בקרה קטן והשלמת מסלול מחומרה בסיסית למערכת נשלטת.</p>
+              </div>
+              <div class="lesson-code">230 robot arm controlled.py</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta">
+        <div class="section-inner">
+          <div>
+            <h2>השלב הבא: פיילוט קצר, מדיד וברור.</h2>
+            <p>
+              מאגר הקוד והדוגמאות זמינים כבר עכשיו. מסמך שיעורים מפורט, מערכי הדרכה וחומרי הערכה יכולים להיבנות מעל בסיס זה לפי גיל, מסגרת, מספר מפגשים ורמת המדריכים.
+            </p>
+          </div>
+          <div class="hero-actions">
+            <a class="button primary" href="https://github.com/avisalmon/single_button" target="_blank" rel="noopener">פתיחת המאגר</a>
+            <a class="button secondary" href="https://youtube.com/playlist?list=PL0zMMCdiaE56wAuAqmGXPQlCa_2BCWRi6" target="_blank" rel="noopener">רשימת YouTube</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      פותח על ידי אבי סלמון | <a href="https://github.com/avisalmon/single_button" target="_blank" rel="noopener">github.com/avisalmon/single_button</a>
+    </footer>
+  </div>
+</body>
+</html>
