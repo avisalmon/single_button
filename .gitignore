@@ -1,2 +1,7 @@
 keys.py
 lounch_cmd.bat
+
+# Python virtual environment
+env/
+__pycache__/
+*.pyc
