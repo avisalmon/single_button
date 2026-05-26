@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>שיעור 2 — התקנות והכנה לתכנות | ESP32 MicroPython</title>
+  <style>
+    :root{--indigo:#6366f1;--purple:#a855f7;--orange:#f97316;--green:#10b981;--red:#ef4444;--sky:#0ea5e9;--bg:#f0f4ff;--white:#fff;--gray50:#f8fafc;--gray100:#f1f5f9;--gray200:#e2e8f0;--gray600:#475569;--gray700:#334155;--gray900:#0f172a}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--gray900);line-height:1.75;display:flex;min-height:100vh}
+
+    /* Sidebar */
+    .sidebar{position:sticky;top:0;width:240px;height:100vh;background:var(--white);border-left:2px solid var(--gray200);padding:18px 0;overflow-y:auto;flex-shrink:0}
+    .sidebar-title{font-size:.82rem;font-weight:900;color:var(--gray600);padding:0 18px 12px;letter-spacing:.04em}
+    .sidebar a{display:block;padding:9px 18px;font-size:.88rem;color:var(--gray700);text-decoration:none;border-right:3px solid transparent;transition:background .15s,border-color .15s}
+    .sidebar a:hover{background:var(--gray50)}
+    .sidebar a.active{background:#eef2ff;border-right-color:var(--indigo);color:var(--indigo);font-weight:800}
+    .sidebar .back-link{margin-top:18px;padding-top:14px;border-top:1px solid var(--gray200)}
+
+    /* Main content */
+    .main-content{flex:1;min-width:0}
+    nav{position:sticky;top:0;z-index:10;height:58px;background:rgba(255,255,255,.95);border-bottom:2px solid var(--gray200);display:flex;align-items:center;justify-content:space-between;padding:0 28px;box-shadow:0 2px 12px rgba(99,102,241,.08)}
+    nav a{color:var(--gray600);text-decoration:none;font-weight:700;font-size:.9rem}
+    .pill{background:linear-gradient(135deg,var(--indigo),var(--purple));color:#fff;border-radius:20px;padding:5px 18px;font-size:.82rem;font-weight:800}
+
+    .hero{background:linear-gradient(135deg,#0891b2,#4f46e5,#7c3aed);color:#fff;text-align:center;padding:62px 24px 54px}
+    .badge{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);border-radius:24px;padding:5px 18px;font-weight:800;font-size:.82rem;margin-bottom:18px}
+    .hero h1{font-size:clamp(2rem,5vw,3.1rem);line-height:1.15;margin-bottom:14px}
+    .hero p{max-width:700px;margin:0 auto 26px;font-size:1.1rem;opacity:.94}
+    .chips{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+    .chip{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:5px 14px;font-size:.84rem;font-weight:700}
+
+    .page{max-width:920px;margin:0 auto;padding:0 24px 80px}
+    .card{background:#fff;border:1px solid var(--gray200);border-radius:22px;padding:34px;margin-top:30px;box-shadow:0 6px 28px rgba(99,102,241,.08)}
+    .label{display:inline-block;background:#eef2ff;color:var(--indigo);border:1px solid #c7d2fe;border-radius:9px;padding:4px 12px;font-size:.74rem;font-weight:900;letter-spacing:.06em;margin-bottom:12px}
+    .card h2{font-size:1.55rem;margin-bottom:8px}
+    .lead{color:var(--gray600);font-size:1rem;margin-bottom:22px}
+    .line{width:54px;height:4px;border-radius:4px;background:linear-gradient(90deg,var(--indigo),var(--purple));margin-bottom:22px}
+
+    .steps{counter-reset:s;display:flex;flex-direction:column;gap:14px}
+    .step{counter-increment:s;background:var(--gray50);border:2px solid var(--gray200);border-radius:15px;padding:17px 18px;display:grid;grid-template-columns:42px 1fr;gap:14px}
+    .step:before{content:counter(s);width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,var(--indigo),var(--purple));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900}
+    .step h3{font-size:1rem;margin-bottom:4px}
+    .step p,.step li{font-size:.91rem;color:var(--gray700)}
+    .step ul{padding-right:18px;margin-top:8px}
+
+    .callout{border-radius:15px;padding:16px 18px;margin:18px 0;display:flex;gap:12px;align-items:flex-start}
+    .info{background:#eff6ff;border:1.5px solid #bfdbfe}
+    .warn{background:#fffbeb;border:1.5px solid #fde68a}
+    .good{background:#f0fdf4;border:1.5px solid #bbf7d0}
+    .danger{background:#fef2f2;border:1.5px solid #fecaca}
+    .callout strong{display:block;margin-bottom:3px}
+    .callout p{font-size:.9rem;color:var(--gray700)}
+
+    code{direction:ltr;display:inline-block;background:#eef2ff;color:#4f46e5;border-radius:6px;padding:1px 7px;font-family:Consolas,monospace;font-size:.86em;font-weight:700}
+    .menu{direction:ltr;unicode-bidi:embed;display:inline-block;background:#fff;border:1px solid var(--gray200);border-radius:7px;padding:2px 8px;font-weight:800}
+
+    .video-link{display:block;position:relative;width:100%;border-radius:18px;overflow:hidden;border:2px solid #c7d2fe;background:#111827;box-shadow:0 12px 30px rgba(15,23,42,.18);margin-bottom:18px;text-decoration:none;color:inherit}
+    .video-link img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;background:#111827}
+    .video-link .play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;background:rgba(255,0,0,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.4);transition:transform .2s}
+    .video-link .play-btn:after{content:'';border-style:solid;border-width:13px 0 13px 22px;border-color:transparent transparent transparent #fff;margin-right:-4px}
+    .video-link:hover .play-btn{transform:translate(-50%,-50%) scale(1.1)}
+    .video-caption{position:absolute;right:0;left:0;bottom:0;padding:24px 20px 14px;background:linear-gradient(180deg,transparent,rgba(15,23,42,.86));color:#fff;font-weight:800;font-size:.95rem;text-align:center}
+
+    .btnrow{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:38px;padding-top:26px;border-top:2px solid var(--gray200)}
+    .btn{display:inline-flex;align-items:center;gap:8px;border-radius:12px;padding:12px 24px;text-decoration:none;font-weight:800}
+    .primary{background:linear-gradient(135deg,var(--indigo),var(--purple));color:#fff}
+    .outline{background:#fff;border:2px solid var(--gray200);color:var(--gray700)}
+    .yt{background:#ff0000;color:#fff}
+
+    @media(max-width:900px){
+      body{flex-direction:column}
+      .sidebar{position:relative;width:100%;height:auto;border-left:none;border-bottom:2px solid var(--gray200);display:flex;flex-wrap:wrap;gap:0;padding:10px 0}
+      .sidebar-title{width:100%}
+      .sidebar a{padding:7px 14px;font-size:.82rem;border-right:none;border-bottom:3px solid transparent}
+      .sidebar a.active{border-bottom-color:var(--indigo);border-right-color:transparent}
+      .sidebar .back-link{margin-top:0;padding-top:0;border-top:none}
+    }
+    @media(max-width:650px){.card{padding:24px 18px}.step{grid-template-columns:1fr}.step:before{margin-bottom:4px}}
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-title">שיעורי הקורס</div>
+  <a href="lesson-01.html">01 מרכיבים משחק מחשב</a>
+  <a class="active" href="lesson-02.html">02 התקנות והכנה לתכנות</a>
+  <a href="lesson-03.html">03 הקו הראשון</a>
+  <a class="back-link" href="../index.html">← חזרה לדף הראשי</a>
+</aside>
+
+<div class="main-content">
+<nav><a href="lesson-01.html">שיעור קודם</a><div class="pill">שיעור 2</div><a href="lesson-03.html">שיעור הבא</a></nav>
+<div class="hero"><div class="badge">שיעור 02</div><h1>התקנות והכנה לתכנות</h1><p>בשיעור הזה נתקין את כל מה שצריך כדי להתחיל לכתוב קוד: סביבת הפיתוח Thonny, טעינת MicroPython ל-ESP32, והעלאת קבצי העזר ללוח. בסוף השיעור הלוח מוכן לשיעור הקוד הראשון.</p><div class="chips"><span class="chip">Thonny IDE</span><span class="chip">MicroPython</span><span class="chip">USB Driver</span><span class="chip">Upload files</span></div></div>
+<div class="page">
+
+  <div class="card"><div class="label">שלב 0</div><h2>הורדת חומרי הקורס למחשב</h2><div class="line"></div><p class="lead">כל חומרי הקורס, כולל דרייברים, קבצי עזר, ודוגמאות הקוד, נמצאים במאגר אחד ב-GitHub. הצעד הראשון הוא להוריד את התיקייה הזו למחשב.</p><div class="steps"><div class="step"><div><h3>התקינו Git (אם אין)</h3><p>היכנסו ל-<a href="https://git-scm.com/download/win" target="_blank" rel="noopener">git-scm.com</a> והורידו את הגרסה ל-Windows. הריצו את ההתקנה עם כל ברירות המחדל (Next בכל שלב).</p></div></div><div class="step"><div><h3>פתחו חלון פקודות (CMD)</h3><p>לחצו על מקש <strong>Windows</strong> במקלדת (הסמל של חלונות, בשורה התחתונה), כתבו <code>cmd</code> ולחצו Enter. ייפתח חלון שחור עם טקסט לבן, זה חלון הפקודות. דרכו אנחנו "מדברים" עם המחשב בכתיבה במקום בלחיצות.</p><div class="callout info" style="margin-top:12px"><div>i</div><div><strong>איך זה נראה?</strong><p>חלון שחור עם שורה כמו:<br><code>C:\Users\YourName&gt;</code><br>המחשב מחכה שתכתבו פקודה ותלחצו Enter.</p></div></div></div></div><div class="step"><div><h3>צרו תיקיית projects</h3><p>עכשיו נגיד למחשב ליצור תיקייה בשם <code>projects</code> בדיסק C. כתבו את הפקודה הבאה ולחצו Enter:</p><p><code>mkdir c:\projects</code></p><div class="callout info" style="margin-top:12px"><div>i</div><div><strong>מה זה mkdir?</strong><p><code>mkdir</code> = Make Directory = צור תיקייה. אנחנו יוצרים תיקייה חדשה בשם projects ישירות על הדיסק C.</p><p>אם מופיעה שגיאה שהתיקייה כבר קיימת, זה בסדר גמור. פשוט המשיכו לשלב הבא.</p></div></div></div></div><div class="step"><div><h3>היכנסו לתיקייה</h3><p>עכשיו נגיד למחשב "היכנס לתיקייה שיצרנו". כתבו:</p><p><code>cd c:\projects</code></p><p>שימו לב שהשורה בחלון השתנתה ל-<code>C:\projects&gt;</code>. זה אומר שאנחנו עכשיו "בתוך" התיקייה.</p><div class="callout info" style="margin-top:12px"><div>i</div><div><strong>מה זה cd?</strong><p><code>cd</code> = Change Directory = עבור לתיקייה. זה כמו ללחוץ פעמיים על תיקייה בסייר הקבצים, רק בכתיבה.</p></div></div></div></div><div class="step"><div><h3>שכפלו את המאגר</h3><p>עכשיו נוריד את כל חומרי הקורס מהאינטרנט לתיקייה שלנו. כתבו:</p><p><code>git clone https://github.com/avisalmon/single_button.git</code></p><p>חכו כמה שניות. כשהפקודה נגמרת, נוצרת תיקייה חדשה בשם <code>single_button</code> בתוך <code>c:\projects</code>.</p><p>כל חומרי הקורס נמצאים עכשיו ב-<code>c:\projects\single_button</code>.</p></div></div><div class="step"><div><h3>זו תיקיית העבודה שלכם</h3><p>מעכשיו, כל מה שמוזכר בשיעורים נמצא בתוך התיקייה הזו:</p><ul><li><code>installation_files/</code> — דרייבר USB וכלי התקנה</li><li><code>Upload_these_to_device/</code> — קבצים שצריך להעלות ללוח</li><li><code>010 lines.py</code>, <code>020 move the line.py</code> וכו׳ — דוגמאות הקוד של השיעורים</li></ul></div></div></div><div class="callout info"><div>i</div><div><strong>אפשר גם בלי Git</strong><p>אם אין אפשרות להתקין Git, אפשר להוריד ZIP מ-<a href="https://github.com/avisalmon/single_button/archive/refs/heads/main.zip" target="_blank" rel="noopener">כאן</a> ולחלץ את התיקייה.</p></div></div></div>
+
+  <div class="card"><div class="label">סרטוני השיעור</div><h2>צפו בסרטונים לפני או במקביל לשלבים</h2><div class="line"></div><p class="lead">השלבים האלה עלולים להרגיש מייגעים ומעצבנים. זה נורמלי. אבל ברגע שמסיימים להתקין הכל, נפתח עולם שלם של משחקים, אנימציות וכיף. עקבו אחרי הסרטון במקביל לטקסט, עזרו אחד לשני, ותגיעו לסוף. זה שווה את זה.</p><p class="lead">שני סרטונים רלוונטיים לשיעור הזה. הראשון הוא מבוא קצר לקורס, השני הוא סרטון ההתקנה המלא (כ-30 דקות).</p><a class="video-link" href="https://www.youtube.com/watch?v=zH8_QF0gqBY" target="_blank" rel="noopener"><img src="https://img.youtube.com/vi/zH8_QF0gqBY/maxresdefault.jpg" alt="001 intro to course" /><span class="play-btn" aria-hidden="true"></span><span class="video-caption">001 מבוא לקורס (3 דקות)</span></a><a class="video-link" href="https://www.youtube.com/watch?v=-p3vHewAgE8" target="_blank" rel="noopener"><img src="https://img.youtube.com/vi/-p3vHewAgE8/maxresdefault.jpg" alt="002 setup" /><span class="play-btn" aria-hidden="true"></span><span class="video-caption">002 התקנה מלאה (30 דקות)</span></a></div>
+
+  <div class="card"><div class="label">שלב 1</div><h2>התקנת Thonny</h2><div class="line"></div><p class="lead">Thonny הוא עורך קוד פשוט שמתקשר ישירות עם ה-ESP32. הוא בחינם ומתאים למתחילים.</p><div class="steps"><div class="step"><div><h3>הורידו את Thonny</h3><p>היכנסו לאתר <a href="https://thonny.org" target="_blank" rel="noopener">thonny.org</a> ולחצו על הכפתור הירוק להורדה ל-Windows.</p></div></div><div class="step"><div><h3>הריצו את ההתקנה</h3><p>לחצו פעמיים על הקובץ שירד. לחצו Next בכל שלב עד סיום ההתקנה.</p></div></div><div class="step"><div><h3>פתחו את Thonny</h3><p>לאחר ההתקנה, פתחו את Thonny מתפריט Start. בפעם הראשונה הוא ישאל על שפה, בחרו English.</p></div></div></div></div>
+
+  <div class="card"><div class="label">שלב 2</div><h2>התקנת דרייבר USB (CP210x)</h2><div class="line"></div><p class="lead">הלוח מתחבר למחשב דרך USB, אבל Windows צריך דרייבר כדי לזהות אותו. אם חיברתם את הלוח ו-Windows כבר מזהה אותו (מופיע COM port ב-Device Manager), אפשר לדלג על השלב הזה.</p><div class="steps"><div class="step"><div><h3>חברו את ה-ESP32 למחשב בכבל USB</h3><p>השתמשו בכבל שתומך בנתונים (לא רק טעינה). אם יש ספק, נסו כבל אחר.</p></div></div><div class="step"><div><h3>פתחו את Device Manager</h3><p>לחצו קליק ימני על Start ובחרו Device Manager. חפשו תחת <span class="menu">Ports (COM & LPT)</span> פורט בשם Silicon Labs CP210x.</p></div></div><div class="step"><div><h3>אם לא מופיע פורט, התקינו את הדרייבר</h3><p>בתיקיית הפרויקט יש תיקייה <code>installation_files</code>. בתוכה תיקיית <code>x64</code>. לחצו ימני על <code>slabvcp.inf</code> ובחרו Install. אשרו אם Windows מבקש.</p></div></div><div class="step"><div><h3>נתקו וחברו מחדש את הכבל</h3><p>אחרי התקנת הדרייבר, נתקו את ה-USB וחברו שוב. עכשיו אמור להופיע פורט COM חדש ב-Device Manager.</p></div></div></div><div class="callout warn"><div>!</div><div><strong>לא עובד?</strong><p>נסו כבל USB אחר. כבלי טעינה בלבד נראים אותו דבר אבל לא מעבירים נתונים. זו הבעיה הנפוצה ביותר.</p></div></div></div>
+
+  <div class="card"><div class="label">שלב 3</div><h2>טעינת MicroPython ל-ESP32</h2><div class="line"></div><p class="lead">הלוח מגיע עם משחק מותקן מראש. כדי לכתוב קוד משלנו, צריך לטעון עליו את MicroPython. זה פעולה חד-פעמית.</p><div class="steps"><div class="step"><div><h3>פתחו את Thonny ולכו להגדרות Interpreter</h3><p>בתפריט העליון: <span class="menu">Tools → Options...</span> ואז לשונית <span class="menu">Interpreter</span>.</p></div></div><div class="step"><div><h3>בחרו MicroPython (ESP32)</h3><p>ברשימה הנפתחת העליונה בחרו <code>MicroPython (ESP32)</code>.</p></div></div><div class="step"><div><h3>בחרו את הפורט</h3><p>ברשימה התחתונה בחרו את הפורט שמופיע (לדוגמה <code>COM3 - Silicon Labs CP210x</code>).</p></div></div><div class="step"><div><h3>לחצו על "Install or update MicroPython"</h3><p>יש קישור קטן בתחתית החלון. לחצו עליו.</p></div></div><div class="step"><div><h3>טענו את הקובץ מהמחשב</h3><p>במקום לבחור גרסה מהרשימה, לחצו על הכפתור <strong>"..."</strong> (שלוש נקודות) ונווטו לתיקיית הפרויקט:</p><p><code>c:\projects\single_button</code></p><p>בחרו את הקובץ <code>ESP32_GENERIC-20230426-v1.20.0.bin</code> ולחצו Open, ואז Install.</p><p>אם מבקשים להחזיק את כפתור BOOT שעל הלוח (ליד ה-USB), החזיקו אותו עד שהטעינה מתחילה ואז שחררו.</p></div></div><div class="step"><div><h3>חכו עד סיום</h3><p>לא לנתק את הכבל. כשהטעינה נגמרת, לחצו Close ואז OK.</p></div></div></div><div class="callout info"><div>i</div><div><strong>מה קרה עכשיו?</strong><p>ה-ESP32 עבר מלהריץ את המשחק המותקן מראש למצב שבו הוא מחכה לקוד Python שלנו. מעכשיו אפשר לכתוב ולהריץ קוד ישירות מ-Thonny.</p></div></div></div>
+
+  <div class="card"><div class="label">שלב 4</div><h2>הגדרת Thonny לעבודה עם הלוח</h2><div class="line"></div><div class="steps"><div class="step"><div><h3>ודאו שה-Interpreter מוגדר</h3><p><span class="menu">Tools → Options → Interpreter</span>: צריך להיות <code>MicroPython (ESP32)</code> עם הפורט הנכון.</p></div></div><div class="step"><div><h3>לחצו OK</h3><p>בתחתית Thonny אמור להופיע Shell עם סימן <code>&gt;&gt;&gt;</code>. זה אומר שהלוח מחובר ומוכן.</p></div></div><div class="step"><div><h3>בדיקה מהירה</h3><p>כתבו ב-Shell למטה: <code>print("hello")</code> ולחצו Enter. אם מופיע <code>hello</code>, הכל עובד.</p></div></div></div><div class="callout danger"><div>!</div><div><strong>לא רואים &gt;&gt;&gt; ?</strong><p>בדקו: (1) הכבל מחובר (2) הפורט נכון בהגדרות (3) סגרו Thonny ופתחו מחדש (4) נסו ללחוץ Stop/Restart בסרגל הכלים של Thonny.</p></div></div></div>
+
+  <div class="card"><div class="label">שלב 5</div><h2>העלאת קבצי עזר ללוח</h2><div class="line"></div><p class="lead">המסך צריך ספרייה בשם <code>ssd1306.py</code> כדי לעבוד. יש גם קבצי גופן ומשחק שנצטרך בהמשך. נעלה את כולם עכשיו.</p><div class="steps"><div class="step"><div><h3>פתחו את חלון הקבצים ב-Thonny</h3><p>בתפריט: <span class="menu">View → Files</span>. יופיעו שני חלונות: המחשב (למעלה) והלוח (למטה).</p></div></div><div class="step"><div><h3>נווטו בצד המחשב לתיקייה <code>Upload_these_to_device</code></h3><p>זו תיקייה בתוך תיקיית הפרויקט. לחצו פעמיים כדי להיכנס אליה.</p></div></div><div class="step"><div><h3>סמנו את כל הקבצים</h3><p>לחצו על הקובץ הראשון, החזיקו <strong>Ctrl+A</strong> כדי לסמן הכל.</p></div></div><div class="step"><div><h3>קליק ימני → Upload to /</h3><p>הקבצים יועתקו לזיכרון ה-ESP32. אם נשאלים אם להחליף קבצים קיימים, בחרו Yes.</p></div></div><div class="step"><div><h3>ודאו שהקבצים הועלו</h3><p>בחלון התחתון (MicroPython device) אמורים להופיע: <code>ssd1306.py</code>, <code>font.py</code>, <code>singame.py</code>, ועוד.</p></div></div></div></div>
+
+  <div class="card"><div class="label">סיום</div><h2>איך יודעים שהכל מוכן?</h2><div class="line"></div><div class="callout good"><div>OK</div><div><strong>בדיקת הצלחה</strong><p>Thonny פתוח, בתחתית יש <code>&gt;&gt;&gt;</code>, ובצד של MicroPython device מופיעים הקבצים <code>ssd1306.py</code> ו-<code>font.py</code>. אם כל זה נכון, אתם מוכנים לשיעור הבא.</p></div></div><div class="callout info"><div>i</div><div><strong>מה הלאה?</strong><p>בשיעור 3 נפתח את <code>010 lines.py</code> ונצייר קו ראשון על המסך. זה הרגע שבו הקוד שלכם מפעיל חומרה אמיתית.</p></div></div></div>
+
+  <div class="btnrow"><a class="btn outline" href="lesson-01.html">שיעור 1 - הרכבה</a><a class="btn yt" href="https://www.youtube.com/watch?v=-p3vHewAgE8" target="_blank">סרטון התקנה מלא</a><a class="btn primary" href="lesson-03.html">שיעור 3 - קו ראשון</a></div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>שיעור 3 — הקו הראשון על המסך | ESP32 MicroPython</title>
+  <style>
+    :root{--indigo:#6366f1;--purple:#a855f7;--orange:#f97316;--green:#10b981;--red:#ef4444;--sky:#0ea5e9;--yellow:#f59e0b;--bg:#f0f4ff;--white:#fff;--gray50:#f8fafc;--gray100:#f1f5f9;--gray200:#e2e8f0;--gray600:#475569;--gray700:#334155;--gray900:#0f172a}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--gray900);line-height:1.75;display:flex;min-height:100vh}
+
+    /* Sidebar */
+    .sidebar{position:sticky;top:0;width:240px;height:100vh;background:var(--white);border-left:2px solid var(--gray200);padding:18px 0;overflow-y:auto;flex-shrink:0}
+    .sidebar-title{font-size:.82rem;font-weight:900;color:var(--gray600);padding:0 18px 12px;letter-spacing:.04em}
+    .sidebar a{display:block;padding:9px 18px;font-size:.88rem;color:var(--gray700);text-decoration:none;border-right:3px solid transparent;transition:background .15s,border-color .15s}
+    .sidebar a:hover{background:var(--gray50)}
+    .sidebar a.active{background:#eef2ff;border-right-color:var(--indigo);color:var(--indigo);font-weight:800}
+    .sidebar .back-link{margin-top:18px;padding-top:14px;border-top:1px solid var(--gray200)}
+
+    /* Main content */
+    .main-content{flex:1;min-width:0}
+    nav{position:sticky;top:0;z-index:10;height:58px;background:rgba(255,255,255,.95);border-bottom:2px solid var(--gray200);display:flex;align-items:center;justify-content:space-between;padding:0 28px;box-shadow:0 2px 12px rgba(99,102,241,.08)}
+    nav a{color:var(--gray600);text-decoration:none;font-weight:700;font-size:.9rem}
+    .pill{background:linear-gradient(135deg,var(--indigo),var(--purple));color:#fff;border-radius:20px;padding:5px 18px;font-size:.82rem;font-weight:800}
+
+    .hero{background:linear-gradient(135deg,#4f46e5,#7c3aed,#a855f7);color:#fff;text-align:center;padding:62px 24px 54px}
+    .badge{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);border-radius:24px;padding:5px 18px;font-weight:800;font-size:.82rem;margin-bottom:18px}
+    .hero h1{font-size:clamp(2rem,5vw,3.1rem);line-height:1.15;margin-bottom:14px}
+    .hero p{max-width:700px;margin:0 auto 26px;font-size:1.1rem;opacity:.94}
+    .chips{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+    .chip{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:5px 14px;font-size:.84rem;font-weight:700}
+
+    .page{max-width:920px;margin:0 auto;padding:0 24px 80px}
+    .card{background:#fff;border:1px solid var(--gray200);border-radius:22px;padding:34px;margin-top:30px;box-shadow:0 6px 28px rgba(99,102,241,.08)}
+    .label{display:inline-block;background:#eef2ff;color:var(--indigo);border:1px solid #c7d2fe;border-radius:9px;padding:4px 12px;font-size:.74rem;font-weight:900;letter-spacing:.06em;margin-bottom:12px}
+    .card h2{font-size:1.55rem;margin-bottom:8px}
+    .lead{color:var(--gray600);font-size:1rem;margin-bottom:22px}
+    .line{width:54px;height:4px;border-radius:4px;background:linear-gradient(90deg,var(--indigo),var(--purple));margin-bottom:22px}
+
+    .callout{border-radius:15px;padding:16px 18px;margin:18px 0;display:flex;gap:12px;align-items:flex-start}
+    .info{background:#eff6ff;border:1.5px solid #bfdbfe}
+    .warn{background:#fffbeb;border:1.5px solid #fde68a}
+    .good{background:#f0fdf4;border:1.5px solid #bbf7d0}
+    .danger{background:#fef2f2;border:1.5px solid #fecaca}
+    .callout strong{display:block;margin-bottom:3px}
+    .callout p{font-size:.9rem;color:var(--gray700)}
+
+    code{direction:ltr;display:inline-block;background:#eef2ff;color:#4f46e5;border-radius:6px;padding:1px 7px;font-family:Consolas,monospace;font-size:.86em;font-weight:700}
+
+    /* Code block */
+    .code-wrap{border-radius:14px;overflow:hidden;border:1px solid #1e1e2e;margin:20px 0;box-shadow:0 8px 28px rgba(0,0,0,.18)}
+    .code-head{background:#1e1e2e;padding:10px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2a2a3e}
+    .code-dots{display:flex;gap:6px}
+    .code-dots span{width:12px;height:12px;border-radius:50%}
+    .dot-r{background:#ff5f57}.dot-y{background:#febc2e}.dot-g{background:#28c840}
+    .code-fname{font-family:monospace;font-size:.8rem;color:#6b7280}
+    .code-lang{font-size:.72rem;font-weight:700;color:#818cf8}
+    pre{background:#13131f;padding:22px;overflow-x:auto;font-family:Consolas,'Courier New',monospace;font-size:.9rem;line-height:1.8;direction:ltr;text-align:left}
+    .kw{color:#c792ea;font-weight:600}.fn{color:#82aaff}.str{color:#c3e88d}.num{color:#f78c6c}.cm{color:#546e7a;font-style:italic}.var{color:#eeffff}.op{color:#89ddff}.param{color:#ffcb6b}
+
+    /* Steps */
+    .steps{display:flex;flex-direction:column;gap:0}
+    .step{display:grid;grid-template-columns:56px 1fr;gap:0 18px;padding:24px 0;border-bottom:2px dashed var(--gray200)}
+    .step:last-child{border-bottom:none}
+    .step-bubble{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;color:#fff;flex-shrink:0}
+    .b-indigo{background:linear-gradient(135deg,var(--indigo),var(--purple))}
+    .b-sky{background:linear-gradient(135deg,var(--sky),var(--indigo))}
+    .b-orange{background:linear-gradient(135deg,var(--orange),var(--yellow))}
+    .b-green{background:linear-gradient(135deg,var(--green),var(--sky))}
+    .b-red{background:linear-gradient(135deg,var(--red),var(--orange))}
+    .step-body h3{font-size:1.05rem;font-weight:700;color:var(--gray900);margin-bottom:6px}
+    .step-body p{font-size:.92rem;color:var(--gray700);margin-bottom:8px}
+
+    /* Param table */
+    .param-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.9rem;direction:rtl}
+    .param-table th{background:var(--bg);color:var(--gray600);font-size:.78rem;font-weight:700;letter-spacing:.05em;padding:9px 14px;text-align:right;border-bottom:2px solid var(--gray200)}
+    .param-table td{padding:10px 14px;border-bottom:1px solid var(--gray100);vertical-align:top;color:var(--gray700)}
+    .param-table tr:hover td{background:var(--gray50)}
+
+    /* Hardware grid */
+    .hw-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-top:16px}
+    .hw-card{border-radius:14px;padding:20px 18px;text-align:center;border:2px solid transparent}
+    .hw-card.c-indigo{background:#eef2ff;border-color:#c7d2fe}
+    .hw-card.c-sky{background:#f0f9ff;border-color:#bae6fd}
+    .hw-card.c-orange{background:#fff7ed;border-color:#fed7aa}
+    .hw-card.c-purple{background:#faf5ff;border-color:#e9d5ff}
+    .hw-icon{font-size:2.4rem;margin-bottom:10px}
+    .hw-card h3{font-size:.95rem;font-weight:700;margin-bottom:5px}
+    .hw-card p{font-size:.82rem;color:var(--gray600)}
+
+    /* OLED preview */
+    .oled-wrap{display:flex;flex-direction:column;align-items:center;gap:16px;margin:24px 0}
+    .oled-bezel{background:#1a1a1a;border-radius:12px;padding:10px 12px;box-shadow:0 0 0 3px #333,0 0 0 5px #222,0 12px 40px rgba(0,0,0,.5),inset 0 0 20px rgba(0,0,0,.8)}
+    .oled-screen{background:#000;border-radius:5px;overflow:hidden;display:block}
+    .oled-label{font-size:.82rem;color:var(--gray600);font-weight:600}
+
+    /* Challenges */
+    .challenges{display:flex;flex-direction:column;gap:20px;margin-top:20px}
+    .chal{border-radius:16px;overflow:hidden;border:2px solid var(--gray200)}
+    .chal-header{display:flex;align-items:center;gap:14px;padding:16px 20px;color:#fff}
+    .chal-header.c1{background:linear-gradient(135deg,#6366f1,#a855f7)}
+    .chal-header.c2{background:linear-gradient(135deg,#f97316,#f59e0b)}
+    .chal-header.c3{background:linear-gradient(135deg,#10b981,#0ea5e9)}
+    .chal-num{width:40px;height:40px;background:rgba(255,255,255,.25);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;flex-shrink:0}
+    .chal-header h3{font-size:1rem;font-weight:700}
+    .chal-header p{font-size:.82rem;opacity:.9;margin-top:2px}
+    .chal-body{background:var(--white);padding:20px 22px}
+    .chal-body p{font-size:.92rem;color:var(--gray700);margin-bottom:14px}
+    .hint{background:var(--bg);border:1px solid var(--gray200);border-radius:10px;padding:12px 16px;font-size:.85rem;color:var(--gray700);display:flex;gap:8px;align-items:flex-start}
+    .hint strong{color:var(--indigo)}
+
+    /* Summary grid */
+    .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:14px;margin-top:16px}
+    .sum-card{background:var(--gray50);border:2px solid var(--gray200);border-radius:14px;padding:18px 14px;text-align:center}
+    .sum-card:hover{border-color:var(--indigo)}
+    .sum-icon{font-size:1.6rem;margin-bottom:8px}
+    .sum-card h4{font-size:.82rem;font-weight:700;margin-bottom:3px}
+    .sum-card p{font-size:.76rem;color:var(--gray600)}
+
+    /* Video link */
+    .video-link{display:block;position:relative;width:100%;border-radius:18px;overflow:hidden;border:2px solid #c7d2fe;background:#111827;box-shadow:0 12px 30px rgba(15,23,42,.18);margin-bottom:18px;text-decoration:none;color:inherit}
+    .video-link img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;background:#111827}
+    .video-link .play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;background:rgba(255,0,0,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.4);transition:transform .2s}
+    .video-link .play-btn:after{content:'';border-style:solid;border-width:13px 0 13px 22px;border-color:transparent transparent transparent #fff;margin-right:-4px}
+    .video-link:hover .play-btn{transform:translate(-50%,-50%) scale(1.1)}
+    .video-caption{position:absolute;right:0;left:0;bottom:0;padding:24px 20px 14px;background:linear-gradient(180deg,transparent,rgba(15,23,42,.86));color:#fff;font-weight:800;font-size:.95rem;text-align:center}
+
+    /* Diagram */
+    .diagram-card{background:var(--gray50);border:2px dashed var(--gray200);border-radius:16px;padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:14px;margin:20px 0}
+    .diagram-caption{font-size:.85rem;color:var(--gray600);text-align:center}
+
+    /* Bottom nav */
+    .btnrow{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:38px;padding-top:26px;border-top:2px solid var(--gray200)}
+    .btn{display:inline-flex;align-items:center;gap:8px;border-radius:12px;padding:12px 24px;text-decoration:none;font-weight:800}
+    .primary{background:linear-gradient(135deg,var(--indigo),var(--purple));color:#fff}
+    .outline{background:#fff;border:2px solid var(--gray200);color:var(--gray700)}
+    .yt{background:#ff0000;color:#fff}
+
+    /* Animated line */
+    @keyframes draw-line{from{stroke-dashoffset:200}to{stroke-dashoffset:0}}
+    .animated-line{stroke-dasharray:200;stroke-dashoffset:200;animation:draw-line 1.2s ease-out forwards;animation-delay:.4s}
+
+    @media(max-width:900px){
+      body{flex-direction:column}
+      .sidebar{position:relative;width:100%;height:auto;border-left:none;border-bottom:2px solid var(--gray200);display:flex;flex-wrap:wrap;gap:0;padding:10px 0}
+      .sidebar-title{width:100%}
+      .sidebar a{padding:7px 14px;font-size:.82rem;border-right:none;border-bottom:3px solid transparent}
+      .sidebar a.active{border-bottom-color:var(--indigo);border-right-color:transparent}
+      .sidebar .back-link{margin-top:0;padding-top:0;border-top:none}
+    }
+    @media(max-width:650px){.card{padding:24px 18px}.step{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-title">שיעורי הקורס</div>
+  <a href="lesson-01.html">01 מרכיבים משחק מחשב</a>
+  <a href="lesson-02.html">02 התקנות והכנה לתכנות</a>
+  <a class="active" href="lesson-03.html">03 הקו הראשון</a>
+  <a class="back-link" href="../index.html">← חזרה לדף הראשי</a>
+</aside>
+
+<div class="main-content">
+<nav><a href="lesson-02.html">שיעור קודם</a><div class="pill">שיעור 3</div><a href="lesson-04.html">שיעור הבא</a></nav>
+
+<div class="hero"><div class="badge">שיעור 03</div><h1>הקו הראשון על המסך</h1><p>שלוש שורות קוד. מסך קטן. ורגע שלא תשכחו. היום נצייר קו לבן על רקע שחור ונבין בדיוק איך זה עובד.</p><div class="chips"><span class="chip">ציור קו על OLED</span><span class="chip">כ-45 דקות</span><span class="chip">010 lines.py</span><span class="chip">ללא ידע קודם</span></div></div>
+
+<div class="page">
+
+  <!-- VIDEO -->
+  <div class="card"><div class="label">סרטון השיעור</div><h2>צפו בהדגמה לפני שמתחילים</h2><div class="line"></div><p class="lead">סרטון של כ-17 דקות שמראה בדיוק מה נעשה בשיעור הזה. מומלץ לפתוח אותו בלשונית נפרדת ולעקוב במקביל.</p><a class="video-link" href="https://www.youtube.com/watch?v=VOU1evNbYDQ" target="_blank" rel="noopener"><img src="https://img.youtube.com/vi/VOU1evNbYDQ/maxresdefault.jpg" alt="010 lines" /><span class="play-btn" aria-hidden="true"></span><span class="video-caption">010 ציור קווים על מסך OLED (17 דקות)</span></a></div>
+
+  <!-- PREP CHECK -->
+  <div class="card"><div class="label">בדיקה מהירה</div><h2>לפני שמתחילים</h2><div class="line"></div><p class="lead">אם עשיתם את שיעור 2, הכל אמור להיות מוכן. בואו נוודא:</p><div class="callout good"><div>✓</div><div><strong>מוכנים אם:</strong><p>1. ה-ESP32 מחובר בכבל USB<br>2. Thonny פתוח ובתחתית מופיע <code>&gt;&gt;&gt;</code><br>3. בצד של MicroPython device מופיעים הקבצים <code>ssd1306.py</code> ו-<code>font.py</code></p></div></div><div class="callout warn"><div>!</div><div><strong>משהו חסר?</strong><p>חזרו ל-<a href="lesson-02.html">שיעור 2</a> ועקבו אחרי השלבים שם. אחרי שהכל עובד, חזרו לכאן.</p></div></div></div>
+
+  <!-- HARDWARE -->
+  <div class="card"><div class="label">חומרה</div><h2>מה בידיים שלנו?</h2><div class="line"></div><p class="lead">ארבעה רכיבים. בואו נכיר כל אחד.</p><div class="hw-grid"><div class="hw-card c-indigo"><div class="hw-icon">🧠</div><h3>ESP32</h3><p>מחשב זעיר בגודל אגודל. מעבד + זיכרון + WiFi. הוא מריץ את הקוד שלנו.</p></div><div class="hw-card c-sky"><div class="hw-icon">🖥️</div><h3>מסך OLED</h3><p>128×64 נקודות, שחור-לבן בלבד. כל פיקסל: 0 = כבוי, 1 = דלוק.</p></div><div class="hw-card c-orange"><div class="hw-icon">🔌</div><h3>I2C — החיבור</h3><p>שפת תקשורת בין הלוח למסך. שני כבלים: SCL (פין 22) ו-SDA (פין 21).</p></div><div class="hw-card c-purple"><div class="hw-icon">🐍</div><h3>MicroPython</h3><p>שפת Python שרצה ישירות על הלוח. אותה Python שמשתמשים בה בתעשייה.</p></div></div>
+
+    <div class="diagram-card" style="margin-top:28px">
+      <svg width="320" height="90" viewBox="0 0 320 90" style="max-width:100%;direction:ltr">
+        <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8"/></marker></defs>
+        <rect x="10" y="15" width="110" height="60" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+        <text x="65" y="42" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#4f46e5">ESP32</text>
+        <text x="65" y="60" text-anchor="middle" font-family="monospace" font-size="9" fill="#6b7280">SCL=22, SDA=21</text>
+        <line x1="120" y1="40" x2="180" y2="40" stroke="#6366f1" stroke-width="2" stroke-dasharray="6,3"/>
+        <text x="150" y="33" text-anchor="middle" font-family="Arial" font-size="10" fill="#6366f1" font-weight="700">I2C</text>
+        <rect x="180" y="15" width="110" height="60" rx="10" fill="#f0fdf4" stroke="#10b981" stroke-width="2"/>
+        <text x="235" y="42" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#059669">OLED</text>
+        <text x="235" y="58" text-anchor="middle" font-family="Arial" font-size="10" fill="#6b7280">128 × 64</text>
+      </svg>
+      <p class="diagram-caption">הלוח מדבר עם המסך דרך חיבור I2C (שני חוטים)</p>
+    </div>
+
+    <div class="callout info"><div>💡</div><div><strong>מה זה I2C?</strong><p>I2C (נהגה "אי-טו-סי") הוא פרוטוקול תקשורת פשוט שמאפשר לרכיבים אלקטרוניים לדבר אחד עם השני דרך שני חוטים בלבד: אחד לסנכרון (SCL, כמו "שעון" שאומר מתי לדבר) ואחד לנתונים (SDA, המידע עצמו). זה כמו שיחה מסודרת: אחד שואל, השני עונה, בתור. בזכות I2C אפשר לחבר כמה רכיבים (מסך, חיישנים, זיכרון) באותם שני חוטים.</p></div></div>
+  </div>
+
+  <!-- COORDINATE SYSTEM -->
+  <div class="card"><div class="label">מערכת קואורדינטות</div><h2>איפה כל נקודה על המסך?</h2><div class="line"></div><p class="lead">לפני שמציירים, צריך להבין את "המפה" של המסך. (0,0) זה הפינה השמאלית העליונה.</p>
+
+    <div class="callout warn"><div>⚠️</div><div><strong>שונה ממתמטיקה!</strong><p>במתמטיקה Y גדל כלפי מעלה. על מסך מחשב Y גדל כלפי מטה. ככל ש-Y גדול יותר, הנקודה נמוכה יותר.</p></div></div>
+
+    <div class="diagram-card">
+      <svg width="440" height="240" viewBox="0 0 440 240" style="max-width:100%;direction:ltr">
+        <defs><marker id="arr2" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8"/></marker></defs>
+        <line x1="60" y1="30" x2="400" y2="30" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <line x1="60" y1="30" x2="60" y2="210" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <text x="405" y="34" font-family="Arial" font-size="12" fill="#94a3b8">X →</text>
+        <text x="52" y="218" font-family="Arial" font-size="12" fill="#94a3b8">↓ Y</text>
+        <rect x="60" y="30" width="320" height="160" fill="#000" rx="3" stroke="#334155" stroke-width="1"/>
+        <line x1="60" y1="110" x2="380" y2="110" stroke="#1e293b" stroke-width=".5"/>
+        <line x1="220" y1="30" x2="220" y2="190" stroke="#1e293b" stroke-width=".5"/>
+        <line class="animated-line" x1="135" y1="55" x2="185" y2="155" stroke="#6ee7b7" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="135" cy="55" r="6" fill="#6366f1" stroke="#fff" stroke-width="2"><animate attributeName="r" from="0" to="6" dur=".3s" begin="1.5s" fill="freeze"/></circle>
+        <circle cx="185" cy="155" r="6" fill="#a855f7" stroke="#fff" stroke-width="2"><animate attributeName="r" from="0" to="6" dur=".3s" begin="1.7s" fill="freeze"/></circle>
+        <text x="63" y="26" font-family="monospace" font-size="11" fill="#64748b">(0, 0)</text>
+        <text x="342" y="26" font-family="monospace" font-size="11" fill="#64748b">(127, 0)</text>
+        <text x="63" y="207" font-family="monospace" font-size="11" fill="#64748b">(0, 63)</text>
+        <text x="328" y="207" font-family="monospace" font-size="11" fill="#64748b">(127, 63)</text>
+        <line x1="135" y1="55" x2="100" y2="38" stroke="#6366f1" stroke-width="1" stroke-dasharray="3,2"/>
+        <text x="60" y="36" font-family="monospace" font-size="11" fill="#6366f1" font-weight="bold">(30, 10)</text>
+        <line x1="185" y1="155" x2="220" y2="168" stroke="#a855f7" stroke-width="1" stroke-dasharray="3,2"/>
+        <text x="222" y="172" font-family="monospace" font-size="11" fill="#a855f7" font-weight="bold">(50, 50)</text>
+        <text x="210" y="22" font-family="Arial" font-size="11" fill="#94a3b8" text-anchor="middle">128 פיקסלים</text>
+        <text x="28" y="115" font-family="Arial" font-size="11" fill="#94a3b8" text-anchor="middle" transform="rotate(-90,28,115)">64 פיקסלים</text>
+      </svg>
+      <p class="diagram-caption">המסך הוא 128 עמודות × 64 שורות. (0,0) = פינה שמאלית-עליונה. Y גדל כלפי מטה.</p>
+    </div>
+  </div>
+
+  <!-- RUN THE CODE -->
+  <div class="card"><div class="label">הפעלה</div><h2>פתחו את הקובץ והריצו</h2><div class="line"></div><p class="lead">הקובץ כבר מוכן בתיקיית הפרויקט. לא צריך להקליד כלום.</p>
+
+    <div class="steps">
+      <div class="step"><div class="step-bubble b-indigo">1</div><div class="step-body"><h3>פתחו את הקובץ ב-Thonny</h3><p>בתפריט העליון: <strong>File → Open</strong>. נווטו ל-<code>c:\projects\single_button</code> ופתחו את הקובץ <code>010 lines.py</code>.</p></div></div>
+      <div class="step"><div class="step-bubble b-green">2</div><div class="step-body"><h3>הריצו</h3><p>לחצו על הכפתור הירוק <strong>Run</strong> (או מקש <strong>F5</strong>). אם Thonny שואל איפה לשמור, בחרו <strong>MicroPython device</strong>.</p></div></div>
+      <div class="step"><div class="step-bubble b-orange">3</div><div class="step-body"><h3>הסתכלו על המסך</h3><p>אמור להופיע קו לבן אלכסוני על רקע שחור. אם המסך ריק, בדקו שהכבל מחובר ונסו שוב.</p></div></div>
+    </div>
+
+    <div class="oled-wrap">
+      <div class="oled-bezel">
+        <svg class="oled-screen" width="256" height="128" viewBox="0 0 128 64">
+          <rect width="128" height="64" fill="#000"/>
+          <line class="animated-line" x1="30" y1="10" x2="50" y2="50" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+          <circle cx="30" cy="10" r="2" fill="#6ee7b7" opacity="0"><animate attributeName="opacity" from="0" to="1" dur=".3s" begin="1.5s" fill="freeze"/></circle>
+          <circle cx="50" cy="50" r="2" fill="#818cf8" opacity="0"><animate attributeName="opacity" from="0" to="1" dur=".3s" begin="1.6s" fill="freeze"/></circle>
+        </svg>
+      </div>
+      <div class="oled-label">ככה זה אמור להיראות — קו מ-(30,10) ל-(50,50)</div>
+    </div>
+  </div>
+
+  <!-- THE CODE -->
+  <div class="card"><div class="label">הקוד</div><h2>מה כתוב בקובץ?</h2><div class="line"></div><p class="lead">פחות מ-10 שורות. בואו נבין כל שורה.</p>
+
+    <div class="code-wrap">
+      <div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-fname">010 lines.py</span><span class="code-lang">MicroPython</span></div>
+      <pre><span class="cm"># ייבוא ספריות — כלים מוכנים שנכתבו עבורנו</span>
+<span class="kw">from</span> <span class="var">machine</span> <span class="kw">import</span> <span class="var">Pin</span><span class="op">,</span> <span class="var">I2C</span>
+<span class="kw">import</span> <span class="var">ssd1306</span>
+
+<span class="cm"># יצירת ערוץ תקשורת I2C עם המסך</span>
+<span class="var">i2c</span> <span class="op">=</span> <span class="fn">I2C</span><span class="op">(</span><span class="param">scl</span><span class="op">=</span><span class="fn">Pin</span><span class="op">(</span><span class="num">22</span><span class="op">),</span> <span class="param">sda</span><span class="op">=</span><span class="fn">Pin</span><span class="op">(</span><span class="num">21</span><span class="op">),</span> <span class="param">freq</span><span class="op">=</span><span class="num">400000</span><span class="op">)</span>
+
+<span class="cm"># יצירת אובייקט המסך: רוחב=128, גובה=64, חיבור=i2c</span>
+<span class="var">display</span> <span class="op">=</span> <span class="var">ssd1306</span><span class="op">.</span><span class="fn">SSD1306_I2C</span><span class="op">(</span><span class="num">128</span><span class="op">,</span> <span class="num">64</span><span class="op">,</span> <span class="var">i2c</span><span class="op">)</span>
+
+<span class="cm"># ניקוי מסך: 0=שחור (כבה הכל), 1=לבן (הדלק הכל)</span>
+<span class="var">display</span><span class="op">.</span><span class="fn">fill</span><span class="op">(</span><span class="num">0</span><span class="op">)</span>
+
+<span class="cm"># ציור קו: (x_התחלה, y_התחלה, x_סוף, y_סוף, צבע)</span>
+<span class="var">display</span><span class="op">.</span><span class="fn">line</span><span class="op">(</span><span class="num">30</span><span class="op">,</span> <span class="num">10</span><span class="op">,</span> <span class="num">50</span><span class="op">,</span> <span class="num">50</span><span class="op">,</span> <span class="num">1</span><span class="op">)</span>
+
+<span class="cm"># שלח את מה שציירנו למסך — בלי זה לא יופיע כלום!</span>
+<span class="var">display</span><span class="op">.</span><span class="fn">show</span><span class="op">()</span></pre>
+    </div>
+  </div>
+
+  <!-- WALKTHROUGH -->
+  <div class="card"><div class="label">הסבר</div><h2>שורה אחר שורה</h2><div class="line"></div>
+
+    <div class="steps">
+      <div class="step"><div class="step-bubble b-indigo">1</div><div class="step-body"><h3>ייבוא ספריות</h3><p><code>from machine import Pin, I2C</code> — אומרים לפייתון: "תביא לי את הכלים Pin ו-I2C מהחבילה machine". הם נותנים לנו גישה לחומרה.</p><p><code>import ssd1306</code> — הקובץ שהעלינו ללוח בשיעור 2. הוא יודע לדבר עם המסך הספציפי שלנו.</p></div></div>
+
+      <div class="step"><div class="step-bubble b-sky">2</div><div class="step-body"><h3>יצירת I2C</h3><p>פותחים ערוץ תקשורת בין הלוח למסך. כמו לפתוח שיחת טלפון לפני שמדברים.</p>
+        <table class="param-table"><tr><th>פרמטר</th><th>ערך</th><th>מה זה</th></tr><tr><td><code>scl</code></td><td><code>Pin(22)</code></td><td>פין שעון — מסנכרן את השיחה</td></tr><tr><td><code>sda</code></td><td><code>Pin(21)</code></td><td>פין נתונים — מעביר את המידע</td></tr><tr><td><code>freq</code></td><td><code>400000</code></td><td>מהירות: 400,000 ביט בשנייה</td></tr></table></div></div>
+
+      <div class="step"><div class="step-bubble b-indigo">3</div><div class="step-body"><h3>יצירת אובייקט המסך</h3><p><code>ssd1306.SSD1306_I2C(128, 64, i2c)</code> — יוצרים "שלט רחוק" למסך. אומרים לו: אתה רחב 128, גבוה 64, ומחובר דרך i2c.</p><p>מהרגע הזה — כל פקודה שנכתוב עם <code>display</code> הולכת למסך.</p></div></div>
+
+      <div class="step"><div class="step-bubble b-orange">4</div><div class="step-body"><h3>ניקוי — <code>display.fill(0)</code></h3><p>מכבה את כל 8,192 הפיקסלים. המסך הופך שחור.</p><p><code>fill(0)</code> = הכל שחור. <code>fill(1)</code> = הכל לבן.</p><div class="callout info"><div>💡</div><div><p>תמיד מתחילים עם <code>fill(0)</code> כדי לנקות מה שהיה לפני.</p></div></div></div></div>
+
+      <div class="step"><div class="step-bubble b-green">5</div><div class="step-body"><h3>ציור — <code>display.line(30, 10, 50, 50, 1)</code></h3><p>הפקודה המרכזית. חמישה מספרים:</p>
+        <table class="param-table"><tr><th>מיקום</th><th>ערך</th><th>מה זה</th></tr><tr><td>1</td><td><code>30</code></td><td>X התחלה — עמודה 30</td></tr><tr><td>2</td><td><code>10</code></td><td>Y התחלה — שורה 10</td></tr><tr><td>3</td><td><code>50</code></td><td>X סוף — עמודה 50</td></tr><tr><td>4</td><td><code>50</code></td><td>Y סוף — שורה 50</td></tr><tr><td>5</td><td><code>1</code></td><td>צבע: 1 = לבן</td></tr></table></div></div>
+
+      <div class="step"><div class="step-bubble b-red">6</div><div class="step-body"><h3>שליחה — <code>display.show()</code></h3><p>כל מה שציירנו עד עכשיו נשמר בזיכרון הלוח, לא על המסך. <code>show()</code> שולח את הכל למסך בבת אחת.</p><div class="callout danger"><div>❗</div><div><strong>הטעות הכי נפוצה</strong><p>שכחתם <code>display.show()</code> — המסך ריק. לכולם זה קורה לפחות פעם אחת.</p></div></div></div></div>
+    </div>
+  </div>
+
+  <!-- CHALLENGES -->
+  <div class="card"><div class="label">אתגרים</div><h2>עכשיו תורכם!</h2><div class="line"></div><p class="lead">הקוד עובד? מעולה. נסו את האתגרים האלה לבד. שנו את המספרים בקובץ, שמרו, והריצו שוב.</p>
+
+    <div class="challenges">
+      <div class="chal"><div class="chal-header c1"><div class="chal-num">1</div><div><h3>צייר X גדול</h3><p>שני קווים שחוצים את המסך מפינה לפינה</p></div></div><div class="chal-body"><p>צייר שני קווים: קו מהפינה השמאלית-עליונה לימנית-תחתונה, וקו מהימנית-עליונה לשמאלית-תחתונה. התוצאה — X ענק.</p><div class="oled-wrap" style="margin:14px 0 10px"><div class="oled-bezel"><svg class="oled-screen" width="192" height="96" viewBox="0 0 128 64"><rect width="128" height="64" fill="#000"/><line x1="0" y1="0" x2="127" y2="63" stroke="#fff" stroke-width="1.5"/><line x1="127" y1="0" x2="0" y2="63" stroke="#fff" stroke-width="1.5"/></svg></div></div><div class="hint"><span>💡</span><div><strong>רמז:</strong> צריך שתי שורות <code>display.line()</code> לפני ה-<code>show()</code>. הפינות: (0,0), (127,0), (0,63), (127,63).</div></div></div></div>
+
+      <div class="chal"><div class="chal-header c2"><div class="chal-num">2</div><div><h3>ציירו אות משמכם</h3><p>בעזרת קווים בלבד</p></div></div><div class="chal-body"><p>בחרו אות אחת משמכם וציירו אותה על המסך. לא צריך מושלם — מספיק שאפשר לזהות.</p><div class="hint"><span>🎯</span><div><strong>טיפ:</strong> תכננו על נייר משובץ. סמנו איפה כל קו מתחיל ומסתיים — ואז תרגמו לקואורדינטות.</div></div></div></div>
+
+      <div class="chal"><div class="chal-header c3"><div class="chal-num">⭐</div><div><h3>בונוס — מסגרת</h3><p>ארבעה קווים שמקיפים את כל המסך</p></div></div><div class="chal-body"><p>ציירו ארבעה קווים שיוצרים מסגרת מלאה סביב קצוות המסך.</p><div class="oled-wrap" style="margin:14px 0 10px"><div class="oled-bezel"><svg class="oled-screen" width="192" height="96" viewBox="0 0 128 64"><rect width="128" height="64" fill="#000"/><line x1="0" y1="0" x2="127" y2="0" stroke="#fff" stroke-width="1.5"/><line x1="0" y1="63" x2="127" y2="63" stroke="#fff" stroke-width="1.5"/><line x1="0" y1="0" x2="0" y2="63" stroke="#fff" stroke-width="1.5"/><line x1="127" y1="0" x2="127" y2="63" stroke="#fff" stroke-width="1.5"/></svg></div></div><div class="hint"><span>💡</span><div><strong>רמז:</strong> קו אופקי = אותו Y, X משתנה. קו אנכי = אותו X, Y משתנה.</div></div></div></div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="card"><div class="label">סיכום</div><h2>מה למדנו היום</h2><div class="line"></div>
+    <div class="summary-grid"><div class="sum-card"><div class="sum-icon">📦</div><h4>import</h4><p>מביא ספריות מוכנות</p></div><div class="sum-card"><div class="sum-icon">🔌</div><h4>I2C</h4><p>ערוץ תקשורת לוח ↔ מסך</p></div><div class="sum-card"><div class="sum-icon">🖥️</div><h4>(0,0) שמאל-מעלה</h4><p>Y גדל כלפי מטה</p></div><div class="sum-card"><div class="sum-icon">⬛</div><h4>fill(0)</h4><p>מנקה את המסך</p></div><div class="sum-card"><div class="sum-icon">✏️</div><h4>line(x1,y1,x2,y2,c)</h4><p>מצייר קו בין שתי נקודות</p></div><div class="sum-card"><div class="sum-icon">📤</div><h4>show()</h4><p>שולח ציור למסך — חובה!</p></div></div>
+
+    <div class="callout info" style="margin-top:24px"><div>🚀</div><div><strong>מה הלאה?</strong><p>בשיעור 4 נגרום לקו לזוז! נלמד על לולאות ומשתנים שגורמים לאנימציה.</p></div></div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="btnrow"><a class="btn outline" href="lesson-02.html">← שיעור 2</a><a class="btn yt" href="https://www.youtube.com/watch?v=VOU1evNbYDQ" target="_blank">▶ YouTube</a><a class="btn primary" href="lesson-04.html">שיעור 4 — הקו שזז →</a></div>
+
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>שיעור 1 - מרכיבים משחק מחשב</title>
+  <style>
+    :root{--indigo:#6366f1;--purple:#a855f7;--orange:#f97316;--green:#10b981;--red:#ef4444;--sky:#0ea5e9;--bg:#f0f4ff;--white:#fff;--gray50:#f8fafc;--gray100:#f1f5f9;--gray200:#e2e8f0;--gray600:#475569;--gray700:#334155;--gray900:#0f172a}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--gray900);line-height:1.75;display:flex;min-height:100vh}
+
+    /* Sidebar */
+    .sidebar{position:sticky;top:0;width:240px;height:100vh;background:var(--white);border-left:2px solid var(--gray200);padding:18px 0;overflow-y:auto;flex-shrink:0}
+    .sidebar-title{font-size:.82rem;font-weight:900;color:var(--gray600);padding:0 18px 12px;letter-spacing:.04em}
+    .sidebar a{display:block;padding:9px 18px;font-size:.88rem;color:var(--gray700);text-decoration:none;border-right:3px solid transparent;transition:background .15s,border-color .15s}
+    .sidebar a:hover{background:var(--gray50)}
+    .sidebar a.active{background:#eef2ff;border-right-color:var(--indigo);color:var(--indigo);font-weight:800}
+    .sidebar .back-link{margin-top:18px;padding-top:14px;border-top:1px solid var(--gray200)}
+
+    /* Main content */
+    .main-content{flex:1;min-width:0}
+    nav{position:sticky;top:0;z-index:10;height:58px;background:rgba(255,255,255,.95);border-bottom:2px solid var(--gray200);display:flex;align-items:center;justify-content:space-between;padding:0 28px;box-shadow:0 2px 12px rgba(99,102,241,.08)}
+    nav a{color:var(--gray600);text-decoration:none;font-weight:700;font-size:.9rem}
+    .pill{background:linear-gradient(135deg,var(--indigo),var(--purple));color:#fff;border-radius:20px;padding:5px 18px;font-size:.82rem;font-weight:800}
+
+    .hero{background:linear-gradient(135deg,#2563eb,#7c3aed,#ec4899);color:#fff;text-align:center;padding:62px 24px 54px;position:relative;overflow:hidden}
+    .hero:before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Ccircle cx='8' cy='8' r='3'/%3E%3Ccircle cx='38' cy='28' r='3'/%3E%3Ccircle cx='18' cy='48' r='3'/%3E%3C/g%3E%3C/svg%3E")}
+    .hero>*{position:relative}
+    .badge{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);border-radius:24px;padding:5px 18px;font-weight:800;font-size:.82rem;margin-bottom:18px}
+    .hero h1{font-size:clamp(2rem,5vw,3.1rem);line-height:1.15;margin-bottom:14px}
+    .hero p{max-width:720px;margin:0 auto 26px;font-size:1.1rem;opacity:.94}
+    .chips{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+    .chip{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:5px 14px;font-size:.84rem;font-weight:700}
+
+    .page{max-width:920px;margin:0 auto;padding:0 24px 80px}
+    .card{background:#fff;border:1px solid var(--gray200);border-radius:22px;padding:34px;margin-top:30px;box-shadow:0 6px 28px rgba(99,102,241,.08)}
+    .label{display:inline-block;background:#eef2ff;color:var(--indigo);border:1px solid #c7d2fe;border-radius:9px;padding:4px 12px;font-size:.74rem;font-weight:900;letter-spacing:.06em;margin-bottom:12px}
+    .card h2{font-size:1.55rem;margin-bottom:8px}
+    .lead{color:var(--gray600);font-size:1rem;margin-bottom:22px}
+    .line{width:54px;height:4px;border-radius:4px;background:linear-gradient(90deg,var(--indigo),var(--purple));margin-bottom:22px}
+
+    .kit-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}
+    .kit{border-radius:16px;padding:20px;text-align:center;border:2px solid}
+    .kit:nth-child(1){background:#eef2ff;border-color:#c7d2fe}
+    .kit:nth-child(2){background:#f0f9ff;border-color:#bae6fd}
+    .kit:nth-child(3){background:#fff7ed;border-color:#fed7aa}
+    .kit:nth-child(4){background:#f0fdf4;border-color:#bbf7d0}
+    .kit .icon{font-size:1.6rem;font-weight:900;margin-bottom:8px;color:var(--indigo)}
+    .kit h3{font-size:1rem}
+    .kit p{font-size:.86rem;color:var(--gray600)}
+
+    .steps{counter-reset:s;display:flex;flex-direction:column;gap:14px}
+    .step{counter-increment:s;background:var(--gray50);border:2px solid var(--gray200);border-radius:15px;padding:17px 18px;display:grid;grid-template-columns:42px 1fr;gap:14px}
+    .step:before{content:counter(s);width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,var(--indigo),var(--purple));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900}
+    .step h3{font-size:1rem;margin-bottom:4px}
+    .step p,.step li{font-size:.91rem;color:var(--gray700)}
+
+    .callout{border-radius:15px;padding:16px 18px;margin:18px 0;display:flex;gap:12px;align-items:flex-start}
+    .warn{background:#fffbeb;border:1.5px solid #fde68a}
+    .good{background:#f0fdf4;border:1.5px solid #bbf7d0}
+    .callout strong{display:block;margin-bottom:3px}
+    .callout p{font-size:.9rem;color:var(--gray700)}
+
+    .video-link{display:block;position:relative;width:100%;border-radius:18px;overflow:hidden;border:2px solid #fed7aa;background:#111827;box-shadow:0 12px 30px rgba(15,23,42,.18);margin-bottom:18px;text-decoration:none;color:inherit}
+    .video-link img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;background:#111827}
+    .video-link .play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:76px;height:76px;background:#ff0000;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 28px rgba(0,0,0,.38);transition:transform .2s}
+    .video-link .play-btn:after{content:'';border-style:solid;border-width:15px 0 15px 25px;border-color:transparent transparent transparent #fff;margin-right:-5px}
+    .video-link:hover .play-btn{transform:translate(-50%,-50%) scale(1.08)}
+    .video-caption{position:absolute;right:0;left:0;bottom:0;padding:28px 20px 18px;background:linear-gradient(180deg,transparent,rgba(15,23,42,.86));color:#fff;font-weight:800;text-align:center}
+
+    .schematic{background:#f8fafc;border:2px solid var(--gray200);border-radius:18px;padding:18px;margin-top:8px}
+    .schematic img{display:block;width:100%;height:auto;border-radius:12px;background:#fff}
+    .schematic figcaption{color:var(--gray600);font-size:.9rem;margin-top:12px}
+
+    .assembly{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px}
+    .assembly div{background:var(--gray50);border:2px solid var(--gray200);border-radius:16px;padding:18px;text-align:center}
+    .assembly strong{display:block;margin-top:8px}
+
+    .btnrow{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:38px;padding-top:26px;border-top:2px solid var(--gray200)}
+    .btn{display:inline-flex;align-items:center;gap:8px;border-radius:12px;padding:12px 24px;text-decoration:none;font-weight:800}
+    .primary{background:linear-gradient(135deg,var(--indigo),var(--purple));color:#fff}
+    .outline{background:#fff;border:2px solid var(--gray200);color:var(--gray700)}
+    .yt{background:#ff0000;color:#fff}
+
+    @media(max-width:900px){
+      body{flex-direction:column}
+      .sidebar{position:relative;width:100%;height:auto;border-left:none;border-bottom:2px solid var(--gray200);display:flex;flex-wrap:wrap;gap:0;padding:10px 0}
+      .sidebar-title{width:100%}
+      .sidebar a{padding:7px 14px;font-size:.82rem;border-right:none;border-bottom:3px solid transparent}
+      .sidebar a.active{border-bottom-color:var(--indigo);border-right-color:transparent}
+      .sidebar .back-link{margin-top:0;padding-top:0;border-top:none}
+    }
+    @media(max-width:650px){.card{padding:24px 18px}.step{grid-template-columns:1fr}.step:before{margin-bottom:4px}}
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-title">שיעורי הקורס</div>
+  <a class="active" href="lesson-01.html">01 מרכיבים משחק מחשב</a>
+  <a href="lesson-02.html">02 התקנות והכנה לתכנות</a>
+  <a href="lesson-03.html">03 הקו הראשון</a>
+  <a class="back-link" href="../index.html">← חזרה לדף הראשי</a>
+</aside>
+
+<div class="main-content">
+<nav><a href="../index.html">חזרה לקורס</a><div class="pill">שיעור 1</div><a href="lesson-02.html">שיעור הבא</a></nav>
+<div class="hero"><div class="badge">שיעור 01</div><h1>מרכיבים משחק מחשב</h1><p>השיעור הראשון הוא שיעור ידיים. לא מתקינים, לא כותבים קוד, ולא טוענים תוכנה. פותחים את הערכה, מזהים את החלקים, מחברים בזהירות, ומבינים מה כל רכיב עושה בתוך משחק קטן.</p><div class="chips"><span class="chip">ערכה בידיים</span><span class="chip">הרכבה</span><span class="chip">מסך וכפתור</span><span class="chip">45 דקות</span></div></div>
+<div class="page">
+  <div class="card"><div class="label">פתיחת שיעור</div><h2>מה עושים היום?</h2><div class="line"></div><p class="lead">המטרה היא לבנות תמונה ברורה של המערכת לפני שנוגעים בתוכנה. תלמיד שיודע להסביר מה מחובר למה, יבין הרבה יותר טוב את הקוד בשיעורים הבאים.</p><div class="assembly"><div>1<strong>פותחים את הערכה</strong><p>בודקים שכל החלקים נמצאים ושום דבר לא שבור.</p></div><div>2<strong>מזהים רכיבים</strong><p>ESP32, מסך OLED, כפתור ובאזר.</p></div><div>3<strong>מרכיבים פיזית</strong><p>מחברים בעדינות לפי הערכה שבידכם.</p></div><div>4<strong>מסבירים את המערכת</strong><p>מי חושב, מי מציג, מי מקבל לחיצה ומי משמיע צליל.</p></div></div></div>
+
+  <div class="card"><div class="label">חומרי פתיחה</div><h2>סרטון וסכמת הערכה</h2><div class="line"></div><p class="lead">הסרטון נותן את ההקשר הכללי לערכה ולרעיון של מיקרו-ארקייד קטן. הסכמה מתחתיו מראה את חלקי הערכה ואת החיבורים הפיזיים שנרכיב בשיעור.</p><a class="video-link" href="https://www.youtube.com/watch?v=Jap-4eeCaNw" target="_blank" rel="noopener"><img src="https://img.youtube.com/vi/Jap-4eeCaNw/maxresdefault.jpg" alt="צפייה בסרטון ב-YouTube" /><span class="play-btn" aria-hidden="true"></span><span class="video-caption">צפייה בסרטון ב-YouTube</span></a><figure class="schematic"><img src="../docs/schematics.png" alt="סכמה של ערכת ESP32 עם מסך OLED, כפתור ובאזר" /><figcaption>סכמת הערכה: ESP32, מסך OLED, כפתור ובאזר.</figcaption></figure></div>
+
+  <div class="card"><div class="label">מה יש בערכה</div><h2>ארבעת החלקים המרכזיים</h2><div class="line"></div><div class="kit-grid"><div class="kit"><div class="icon">CPU</div><h3>ESP32</h3><p>המחשב הקטן. הוא יריץ בהמשך את הקוד, יקרא את הכפתור, יצייר למסך וישלוט בצלילים.</p></div><div class="kit"><div class="icon">OLED</div><h3>מסך OLED</h3><p>המסך הקטן שעליו נראה קווים, טקסט, שחקנים, ניקוד ותפריטים.</p></div><div class="kit"><div class="icon">BTN</div><h3>כפתור</h3><p>הקלט של המשתמש. לחיצה אחת יכולה להזיז דמות, לבחור אפשרות או להתחיל משחק.</p></div><div class="kit"><div class="icon">SND</div><h3>באזר</h3><p>רכיב הצליל. בהמשך נשתמש בו לצפצופים, הצלחות, פסילות ואפקטים.</p></div></div></div>
+
+  <div class="card"><div class="label">בטיחות והרכבה</div><h2>איך מרכיבים בלי להרוס?</h2><div class="line"></div><div class="callout warn"><div>!</div><div><strong>עדינות לפני כוח</strong><p>אם חלק לא נכנס בקלות, עוצרים ובודקים כיוון. לא דוחפים בכוח מחבר, מסך או כפתור.</p></div></div><div class="steps"><div class="step"><div><h3>עובדים על שולחן נקי</h3><p>פנו מקום. הניחו את כל החלקים מולכם כדי שלא יאבדו ברגים, חוטים או מחברים קטנים.</p></div></div><div class="step"><div><h3>בודקים כיוונים</h3><p>לפני חיבור, מסתכלים על צורת המחבר ועל הכיתוב שעל הלוח. חלקים אלקטרוניים אוהבים כיוון נכון.</p></div></div><div class="step"><div><h3>מחברים את המסך</h3><p>המסך הוא חלון המשחק. חברו אותו לערכה לפי המבנה הפיזי שקיבלתם, בלי למשוך בחוטים ובלי לכופף את הפינים.</p></div></div><div class="step"><div><h3>מחברים את הכפתור</h3><p>הכפתור צריך להיות נוח ללחיצה. בדקו שהוא יושב יציב ושאפשר ללחוץ עליו בלי להזיז את כל הערכה.</p></div></div><div class="step"><div><h3>ממקמים את הבאזר</h3><p>הבאזר צריך להישאר מחובר וגלוי. הוא יהיה מקור הצלילים של המשחקים שנבנה בהמשך.</p></div></div><div class="step"><div><h3>בדיקת מורה</h3><p>לפני חיבור לחשמל או למחשב, נותנים למורה לבדוק שההרכבה נראית תקינה.</p></div></div></div></div>
+
+  <div class="card"><div class="label">הבנה לפני קוד</div><h2>איך הערכה הופכת למשחק?</h2><div class="line"></div><p class="lead">גם בלי קוד, אפשר להבין את תפקיד החלקים כמו סיפור של משחק.</p><div class="steps"><div class="step"><div><h3>השחקן לוחץ</h3><p>הכפתור אומר ל-ESP32 שמשהו קרה.</p></div></div><div class="step"><div><h3>ה-ESP32 מחליט</h3><p>בהמשך הקוד יחליט אם הדמות קופצת, אם הניקוד עולה או אם המשחק נגמר.</p></div></div><div class="step"><div><h3>המסך מציג</h3><p>ה-OLED מראה לתלמיד מה מצב המשחק בכל רגע.</p></div></div><div class="step"><div><h3>הבאזר מגיב</h3><p>צליל קצר יכול לסמן הצלחה, פסילה או התחלה חדשה.</p></div></div></div></div>
+
+  <div class="card"><div class="label">סיום</div><h2>מה לדעת בסוף השיעור</h2><div class="line"></div><div class="callout good"><div>OK</div><div><strong>מוכנים לשלב הבא</strong><p>הערכה מורכבת, החלקים מזוהים, ואפשר להסביר מה כל רכיב עושה. בשיעור הבא נתקין את סביבת הפיתוח ונתחבר ל-ESP32.</p></div></div></div>
+
+  <div class="btnrow"><a class="btn outline" href="../index.html">כל השיעורים</a><a class="btn yt" href="https://www.youtube.com/watch?v=Jap-4eeCaNw">סרטון פתיחה</a><a class="btn primary" href="lesson-02.html">שיעור 2 - התקנות</a></div>
+</div>
+</div>
+</body>
+</html>
