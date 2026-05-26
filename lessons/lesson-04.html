@@ -95,8 +95,13 @@
     .chal-header p{font-size:.82rem;opacity:.9;margin-top:2px}
     .chal-body{background:var(--white);padding:20px 22px}
     .chal-body p{font-size:.92rem;color:var(--gray700);margin-bottom:14px}
-    .hint{background:var(--bg);border:1px solid var(--gray200);border-radius:10px;padding:12px 16px;font-size:.85rem;color:var(--gray700);display:flex;gap:8px;align-items:flex-start}
-    .hint strong{color:var(--indigo)}
+    .hint{background:var(--bg);border:1px solid var(--gray200);border-radius:10px;padding:0;font-size:.85rem;color:var(--gray700);overflow:hidden}
+    .hint summary{cursor:pointer;padding:12px 16px;font-weight:700;color:var(--indigo);list-style:none;display:flex;align-items:center;gap:8px;user-select:none}
+    .hint summary::-webkit-details-marker{display:none}
+    .hint summary::before{content:'▶';font-size:.7rem;transition:transform .2s}
+    .hint[open] summary::before{transform:rotate(90deg)}
+    .hint .hint-body{padding:0 16px 14px;display:flex;gap:8px;align-items:flex-start}
+    .hint .hint-body strong{color:var(--indigo)}
 
     /* Summary grid */
     .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:14px;margin-top:16px}
@@ -268,11 +273,11 @@
   <div class="card"><div class="label">אתגרים</div><h2>עכשיו תורכם!</h2><div class="line"></div><p class="lead">שנו מספרים בקוד, שמרו, והריצו שוב. ראו מה משתנה.</p>
 
     <div class="challenges">
-      <div class="chal"><div class="chal-header c1"><div class="chal-num">1</div><div><h3>הפכו את זה למהיר יותר</h3><p>שנו מספר אחד בלבד</p></div></div><div class="chal-body"><p>גרמו לקו לזוז מהר יותר. מצאו את המשתנה שאחראי על כמה פיקסלים הקו קופץ בכל סיבוב, ושנו אותו.</p><div class="hint"><span>💡</span><div><strong>רמז:</strong> חפשו בקוד את המילה "speed". חשבו — אם הקו מתקדם 1 כל פעם, מה קורה כשהוא מתקדם יותר?</div></div></div></div>
+      <div class="chal"><div class="chal-header c1"><div class="chal-num">1</div><div><h3>הפכו את זה למהיר יותר</h3><p>שנו מספר אחד בלבד</p></div></div><div class="chal-body"><p>גרמו לקו לזוז מהר יותר. מצאו את המשתנה שאחראי על כמה פיקסלים הקו קופץ בכל סיבוב, ושנו אותו.</p><details class="hint"><summary>💡 לחצו לרמז</summary><div class="hint-body"><span></span><div>חפשו בקוד את המילה "speed". חשבו — אם הקו מתקדם 1 כל פעם, מה קורה כשהוא מתקדם יותר?</div></div></details></div></div>
 
-      <div class="chal"><div class="chal-header c2"><div class="chal-num">2</div><div><h3>הפכו את הכיוון</h3><p>הצד העליון קבוע, התחתון זז</p></div></div><div class="chal-body"><p>עכשיו הקו זז מלמעלה. שנו אותו כך שהנקודה העליונה של הקו קבועה במקום, והנקודה התחתונה היא שזזה.</p><div class="hint"><span>🎯</span><div><strong>רמז:</strong> בשורת <code>display.line(x, 0, 63, 63, 1)</code> — הפרמטר הראשון (<code>x</code>) הוא הנקודה שזזה. העבירו את ה-<code>x</code> למקום אחר בפקודה.</div></div></div></div>
+      <div class="chal"><div class="chal-header c2"><div class="chal-num">2</div><div><h3>הפכו את הכיוון</h3><p>הצד העליון קבוע, התחתון זז</p></div></div><div class="chal-body"><p>עכשיו הקו זז מלמעלה. שנו אותו כך שהנקודה העליונה של הקו קבועה במקום, והנקודה התחתונה היא שזזה.</p><details class="hint"><summary>🎯 לחצו לרמז</summary><div class="hint-body"><span></span><div>בשורת <code>display.line(x, 0, 63, 63, 1)</code> — הפרמטר הראשון (<code>x</code>) הוא הנקודה שזזה. העבירו את ה-<code>x</code> למקום אחר בפקודה.</div></div></details></div></div>
 
-      <div class="chal"><div class="chal-header c3"><div class="chal-num">⭐</div><div><h3>בונוס — תנועה בשני הצירים</h3><p>הקו זז גם למעלה ולמטה</p></div></div><div class="chal-body"><p>הוסיפו משתנה <code>y</code> ו-<code>y_speed</code> וגרמו לנקודה גם לעלות ולרדת, לא רק ימינה ושמאלה.</p><div class="hint"><span>💡</span><div><strong>רמז:</strong> שכפלו את אותו דפוס: <code>y += y_speed</code> ו-<code>if y > 63 or y < 0: y_speed *= -1</code>. השתמשו ב-<code>y</code> בתוך <code>display.line()</code>.</div></div></div></div>
+      <div class="chal"><div class="chal-header c3"><div class="chal-num">⭐</div><div><h3>בונוס — תנועה בשני הצירים</h3><p>הקו זז גם למעלה ולמטה</p></div></div><div class="chal-body"><p>הוסיפו משתנה <code>y</code> ו-<code>y_speed</code> וגרמו לנקודה גם לעלות ולרדת, לא רק ימינה ושמאלה.</p><details class="hint"><summary>💡 לחצו לרמז</summary><div class="hint-body"><span></span><div>שכפלו את אותו דפוס: <code>y += y_speed</code> ו-<code>if y > 63 or y < 0: y_speed *= -1</code>. השתמשו ב-<code>y</code> בתוך <code>display.line()</code>.</div></div></details></div></div>
     </div>
   </div>
 
