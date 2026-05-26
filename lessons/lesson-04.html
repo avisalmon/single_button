@@ -133,6 +133,9 @@
     /* Animated line */
     @keyframes sweep{0%{transform:rotate(0deg)}50%{transform:rotate(30deg)}100%{transform:rotate(0deg)}}
     .sweep-line{transform-origin:64px 63px;animation:sweep 2s ease-in-out infinite}
+    @keyframes bounceX{0%,100%{cx:10}50%{cx:118}}
+    @keyframes bounceY{0%,100%{cy:10}50%{cy:54}}
+    .bounce-dot{animation:bounceX 3s ease-in-out infinite,bounceY 2.1s ease-in-out infinite}
 
     @media(max-width:900px){
       body{flex-direction:column}
@@ -277,7 +280,24 @@
 
       <div class="chal"><div class="chal-header c2"><div class="chal-num">2</div><div><h3>הפכו את הכיוון</h3><p>הצד העליון קבוע, התחתון זז</p></div></div><div class="chal-body"><p>עכשיו הקו זז מלמעלה. שנו אותו כך שהנקודה העליונה של הקו קבועה במקום, והנקודה התחתונה היא שזזה.</p><details class="hint"><summary>🎯 לחצו לרמז</summary><div class="hint-body"><span></span><div>בשורת <code>display.line(x, 0, 63, 63, 1)</code> — הפרמטר הראשון (<code>x</code>) הוא הנקודה שזזה. העבירו את ה-<code>x</code> למקום אחר בפקודה.</div></div></details></div></div>
 
-      <div class="chal"><div class="chal-header c3"><div class="chal-num">⭐</div><div><h3>בונוס — תנועה בשני הצירים</h3><p>הקו זז גם למעלה ולמטה</p></div></div><div class="chal-body"><p>הוסיפו משתנה <code>y</code> ו-<code>y_speed</code> וגרמו לנקודה גם לעלות ולרדת, לא רק ימינה ושמאלה.</p><details class="hint"><summary>💡 לחצו לרמז</summary><div class="hint-body"><span></span><div>שכפלו את אותו דפוס: <code>y += y_speed</code> ו-<code>if y > 63 or y < 0: y_speed *= -1</code>. השתמשו ב-<code>y</code> בתוך <code>display.line()</code>.</div></div></details></div></div>
+      <div class="chal"><div class="chal-header c3"><div class="chal-num">⭐</div><div><h3>בונוס — תנועה בשני הצירים</h3><p>הקו זז גם למעלה ולמטה</p></div></div><div class="chal-body"><p>הוסיפו משתנה <code>y</code> ו-<code>y_speed</code> וגרמו לנקודה גם לעלות ולרדת, לא רק ימינה ושמאלה.</p>
+        <div class="oled-wrap">
+          <div class="oled-bezel">
+            <svg class="oled-screen" width="256" height="128" viewBox="0 0 128 64">
+              <rect width="128" height="64" fill="#000"/>
+              <line x1="64" y1="32" x2="10" y2="10" stroke="#fff" stroke-width="1">
+                <animate attributeName="x2" values="10;118;10" dur="3s" repeatCount="indefinite" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+                <animate attributeName="y2" values="10;54;10" dur="2.1s" repeatCount="indefinite" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+              </line>
+              <circle cx="10" cy="10" r="2" fill="#0f0">
+                <animate attributeName="cx" values="10;118;10" dur="3s" repeatCount="indefinite" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+                <animate attributeName="cy" values="10;54;10" dur="2.1s" repeatCount="indefinite" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+              </circle>
+            </svg>
+          </div>
+          <div class="oled-label">הנקודה הירוקה זזה בשני הצירים בו-זמנית</div>
+        </div>
+      <details class="hint"><summary>💡 לחצו לרמז</summary><div class="hint-body"><span></span><div>שכפלו את אותו דפוס: <code>y += y_speed</code> ו-<code>if y > 63 or y < 0: y_speed *= -1</code>. השתמשו ב-<code>y</code> בתוך <code>display.line()</code>.</div></div></details></div></div>
     </div>
   </div>
 
