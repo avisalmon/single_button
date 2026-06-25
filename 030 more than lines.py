@@ -10,7 +10,7 @@
 from machine import Pin, I2C
 import ssd1306
 
-i2c = I2C(scl=Pin(22), sda=Pin(21), freq=4000000) 
+i2c = I2C(0, scl=Pin(22), sda=Pin(21), freq=400000) 
 display = ssd1306.SSD1306_I2C(128, 64, i2c)  # display object
 
 # Lets see what else we can draw

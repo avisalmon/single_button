@@ -12,7 +12,7 @@ import ssd1306
 from font import Font
 from time import sleep, ticks_ms
 
-i2c = I2C(scl=Pin(22), sda=Pin(21), freq=4000000) 
+i2c = I2C(0, scl=Pin(22), sda=Pin(21), freq=400000) 
 display = ssd1306.SSD1306_I2C(128, 64, i2c)  # display object
 f=Font(display)
 

@@ -21,7 +21,7 @@ buzzer_pin = Pin(23, Pin.OUT)
 buzzer_pwm = PWM(buzzer_pin)
 buzzer_pwm.duty(0)
 
-i2c = I2C(scl=Pin(22), sda=Pin(21), freq=4000000) 
+i2c = I2C(0, scl=Pin(22), sda=Pin(21), freq=400000) 
 display = ssd1306.SSD1306_I2C(128, 64, i2c)  # display object
 f=Font(display)
 

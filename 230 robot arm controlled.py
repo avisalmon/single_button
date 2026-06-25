@@ -18,7 +18,7 @@ HOST = '0.0.0.0'  # Listen on all available interfaces
 PORT = 80  # Standard HTTP port
 
 # OLED Display Setup (as seen in 010 lines.py)
-i2c = I2C(scl=Pin(22), sda=Pin(21), freq=400000)
+i2c = I2C(0, scl=Pin(22), sda=Pin(21), freq=400000)
 display = ssd1306.SSD1306_I2C(128, 64, i2c)
 display.fill(0)
 display.text("Server starting...", 0, 0)

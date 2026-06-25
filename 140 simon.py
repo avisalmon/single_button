@@ -5,7 +5,7 @@ import time
 import urandom
 
 # Initialize I2C for OLED
-i2c = machine.I2C(scl=machine.Pin(22), sda=machine.Pin(21))
+i2c = machine.I2C(0, scl=machine.Pin(22), sda=machine.Pin(21), freq=400000)
 oled = ssd1306.SSD1306_I2C(128, 64, i2c)
 
 from time import sleep_ms
